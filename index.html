@@ -6,7 +6,6 @@
 <title>🦅 RAPTOR One</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 <style>
 :root{
   --bg:#f5f7fa;--bg2:#ffffff;--bg3:#eef0f3;--border:#d0d7de;
@@ -17,61 +16,31 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;min-height:100vh}
-
-/* ═══ HEADER ═══════════════════════════════ */
-#header{
-  background:var(--bg2);border-bottom:1px solid var(--border);
-  padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-  position:sticky;top:0;z-index:100;
-}
-#header .logo{font-size:18px;font-weight:700;letter-spacing:1px;white-space:nowrap;
-  background:linear-gradient(135deg,#f0883e,#e3b341);-webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;background-clip:text;}
+#header{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:100;}
+#header .logo{font-size:18px;font-weight:700;letter-spacing:1px;white-space:nowrap;background:linear-gradient(135deg,#f0883e,#e3b341);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 #header .sub{font-size:11px;color:var(--text2);white-space:nowrap}
 #header .spacer{flex:1}
-#srcSelect{background:var(--bg3);border:1px solid var(--border);color:var(--text);
-  padding:5px 10px;border-radius:6px;font-size:12px;cursor:pointer}
-#btnReload{background:#0969da;border:1px solid #388bfd;color:#fff;padding:6px 14px;
-  border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;}
+#srcSelect{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:6px;font-size:12px;cursor:pointer}
+#btnReload{background:#0969da;border:1px solid #388bfd;color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;}
 #btnReload:hover{background:#388bfd}
-#btnRun{background:#238636;border:1px solid #2ea043;color:#fff;padding:6px 16px;
-  border-radius:6px;cursor:pointer;font-weight:600;font-size:13px;white-space:nowrap}
+#btnRun{background:#238636;border:1px solid #2ea043;color:#fff;padding:6px 16px;border-radius:6px;cursor:pointer;font-weight:600;font-size:13px;white-space:nowrap}
 #btnRun:hover{background:#2ea043}
 #btnRun.running{background:#388bfd;border-color:#388bfd;animation:pulse 1s infinite}
-#btnExcel{background:var(--bg3);border:1px solid var(--border);color:var(--text);
-  padding:6px 12px;border-radius:6px;cursor:pointer;font-size:13px}
-#btnExcel:hover{border-color:var(--green);color:var(--green)}
+#btnExcel{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:13px}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
-
-/* counter badges */
-.hbadge{background:var(--bg3);border:1px solid var(--border);border-radius:12px;
-  padding:3px 10px;font-size:11px;color:var(--text2);white-space:nowrap}
+.hbadge{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:3px 10px;font-size:11px;color:var(--text2);white-space:nowrap}
 .hbadge span{color:var(--text);font-weight:600}
-
-/* ═══ TIMESTAMP / SMART REFRESH BAR ═══════ */
-#tsBar{background:var(--bg2);border-bottom:1px solid var(--border);
-  padding:5px 16px;font-size:11px;color:var(--text2);display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-#smartToggle{background:var(--bg3);border:1px solid var(--border);color:var(--text);
-  padding:3px 10px;border-radius:5px;cursor:pointer;font-size:11px}
+#tsBar{background:var(--bg2);border-bottom:1px solid var(--border);padding:5px 16px;font-size:11px;color:var(--text2);display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+#smartToggle{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:3px 10px;border-radius:5px;cursor:pointer;font-size:11px}
 #smartToggle.active{border-color:var(--green);color:var(--green)}
-#countdown{font-size:11px;color:var(--text2)}
-
-/* ═══ PROGRESS ══════════════════════════════ */
 #progressWrap{padding:8px 16px;background:var(--bg2);border-bottom:1px solid var(--border);display:none}
 #progressBar{height:4px;background:var(--blue);border-radius:2px;transition:width .3s;width:0%}
 #progressBg{height:4px;background:var(--border);border-radius:2px}
 #progressInfo{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-top:4px}
-
-/* ═══ FILTER BARS ═══════════════════════════ */
 .filter-section{background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 16px}
 .filter-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .filter-label{font-size:11px;color:var(--text2);white-space:nowrap;margin-right:2px}
-
-/* Signal buttons - row 1 */
-.btn-sig{border:1px solid var(--border);background:var(--bg3);color:var(--text2);
-  padding:4px 12px;border-radius:16px;cursor:pointer;font-size:12px;
-  transition:all .15s;white-space:nowrap}
-.btn-sig:hover{border-color:var(--text2);color:var(--text)}
+.btn-sig{border:1px solid var(--border);background:var(--bg3);color:var(--text2);padding:4px 12px;border-radius:16px;cursor:pointer;font-size:12px;transition:all .15s;white-space:nowrap}
 .btn-sig.active{color:#fff;font-weight:600}
 .btn-sig[data-sig="ALL"].active{border-color:var(--text);background:var(--bg3);color:var(--text)}
 .btn-sig[data-sig="LONG"].active{border-color:var(--long);background:#dafbe1;color:var(--long)}
@@ -82,40 +51,21 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .btn-sig[data-sig="STOP"].active{border-color:var(--stop);background:#ffebe9;color:var(--stop)}
 .btn-sig[data-sig="USCITA"].active{border-color:#a40000;background:#ffebe9;color:#a40000}
 .btn-sig[data-sig="ATTENZIONE"].active{border-color:var(--attenzione);background:#fff8c5;color:var(--attenzione)}
-
-/* Combined filter buttons - row 2 */
-.btn-combo{border:1px solid var(--border);background:var(--bg3);color:var(--text2);
-  padding:4px 11px;border-radius:14px;cursor:pointer;font-size:11px;
-  transition:all .15s;white-space:nowrap}
-.btn-combo:hover{border-color:var(--purple);color:var(--purple)}
+.btn-combo{border:1px solid var(--border);background:var(--bg3);color:var(--text2);padding:4px 11px;border-radius:14px;cursor:pointer;font-size:11px;transition:all .15s;white-space:nowrap}
 .btn-combo.active{border-color:var(--purple);background:#f0ebff;color:var(--purple);font-weight:600}
-
-/* Category buttons - row 3 */
 #catRow{display:none;gap:5px;flex-wrap:wrap;align-items:center;padding-top:8px}
 #catRow.open{display:flex}
-.btn-cat{border:1px solid var(--border);background:var(--bg3);color:var(--text2);
-  padding:3px 10px;border-radius:12px;cursor:pointer;font-size:11px;
-  transition:all .15s;white-space:nowrap}
-.btn-cat:hover{border-color:var(--text2);color:var(--text)}
+.btn-cat{border:1px solid var(--border);background:var(--bg3);color:var(--text2);padding:3px 10px;border-radius:12px;cursor:pointer;font-size:11px;transition:all .15s;white-space:nowrap}
 .btn-cat.active{border-color:var(--blue);background:#ddf4ff;color:var(--blue);font-weight:600}
-#btnToggleCat{border:1px solid var(--border);background:var(--bg3);color:var(--text2);
-  padding:3px 10px;border-radius:12px;cursor:pointer;font-size:11px}
-#btnToggleCat:hover{border-color:var(--blue);color:var(--blue)}
-
-/* ═══ TABLE ══════════════════════════════════ */
+#btnToggleCat{border:1px solid var(--border);background:var(--bg3);color:var(--text2);padding:3px 10px;border-radius:12px;cursor:pointer;font-size:11px}
 #tableWrap{overflow-x:auto;padding:0}
 table{width:100%;border-collapse:collapse;min-width:1200px}
 thead tr{background:var(--bg2);position:sticky;top:0;z-index:10}
-th{padding:8px 6px;text-align:left;font-size:11px;color:var(--text2);
-  border-bottom:2px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
-th:hover{color:var(--text)}
+th{padding:8px 6px;text-align:left;font-size:11px;color:var(--text2);border-bottom:2px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
 th.sort-asc::after{content:' ▲';font-size:9px}
 th.sort-desc::after{content:' ▼';font-size:9px}
 td{padding:6px 6px;border-bottom:1px solid #e8ecf0;vertical-align:middle;white-space:nowrap}
 tr:hover td{background:#f0f6ff}
-.t-err td{opacity:.4}
-
-/* Signal badges in table */
 .sig{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
 .sig-LONG{background:#dafbe1;color:#1a7f37;border:1px solid #1a7f37}
 .sig-EARLY{background:#ddf4ff;color:#0969da;border:1px solid #0969da}
@@ -126,128 +76,64 @@ tr:hover td{background:#f0f6ff}
 .sig-USCITA{background:#ffebe9;color:#a40000;border:1px solid #a40000}
 .sig-ATTENZIONE{background:#fff8c5;color:#7d4e00;border:1px solid #7d4e00}
 .sig-empty{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
-
-/* Trendycator */
 .trend-V{color:var(--green);font-weight:700}
 .trend-R{color:var(--red);font-weight:700}
 .trend-G{color:var(--text2)}
-
-/* NEW badge */
-.new-badge{display:inline-block;background:#ddf4ff;color:var(--blue);border:1px solid var(--blue);
-  font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px}
-
-/* Positive/negative */
+.new-badge{display:inline-block;background:#ddf4ff;color:var(--blue);border:1px solid var(--blue);font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:3px}
 .pos{color:var(--green)}.neg{color:var(--red)}
-
-/* Chart button */
-.btn-chart{background:var(--bg3);border:1px solid var(--border);color:var(--text2);
-  padding:3px 8px;border-radius:5px;cursor:pointer;font-size:11px}
+.btn-chart{background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:3px 8px;border-radius:5px;cursor:pointer;font-size:11px}
 .btn-chart:hover{border-color:var(--orange);color:var(--orange)}
-
-/* Error row */
-.err-cell{color:var(--red);font-size:11px}
-.fail-cell{color:var(--text2);font-size:11px}
-
-/* ═══ CHART MODE ═════════════════════════════ */
 #chartMode{display:none}
-#chartHeader{background:var(--bg2);border-bottom:1px solid var(--border);
-  padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+#chartHeader{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 #chartTitle{font-size:15px;font-weight:700;color:var(--text)}
 #chartSub{font-size:12px;color:var(--text2)}
-.tf-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);
-  padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px}
-.tf-btn:hover{border-color:var(--blue);color:var(--blue)}
+.tf-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px}
 .tf-btn.active{border-color:var(--blue);background:#ddf4ff;color:var(--blue);font-weight:600}
-.tf-btn.disabled{opacity:.3;cursor:not-allowed;pointer-events:none}
-
-#infoBar{display:flex;gap:16px;flex-wrap:wrap;padding:10px 16px;
-  background:var(--bg2);border-bottom:1px solid var(--border)}
-.info-card{min-width:80px}
+#infoBar{display:flex;gap:16px;flex-wrap:wrap;padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border)}
 .info-card .lbl{font-size:10px;color:var(--text2);margin-bottom:2px}
 .info-card .val{font-size:14px;font-weight:700;color:var(--text)}
 .info-card .sub{font-size:10px;color:var(--text2)}
-
 #panels{padding:12px 16px;display:flex;flex-direction:column;gap:8px}
-.panel-body{overflow:hidden}
 .panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}
-.panel-title{padding:6px 12px;font-size:11px;color:var(--text2);border-bottom:1px solid var(--border);
-  background:var(--bg3)}
-.panel-body{overflow:hidden}
-.panel-body canvas{display:block}
-
-/* ═══ LOADING OVERLAY ════════════════════════ */
-#loadOverlay{position:fixed;inset:0;background:rgba(245,247,250,.92);display:flex;
-  flex-direction:column;align-items:center;justify-content:center;z-index:1000;display:none}
-#loadOverlay .spinner{width:40px;height:40px;border:3px solid var(--border);
-  border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px}
+.panel-title{padding:6px 12px;font-size:11px;color:var(--text2);border-bottom:1px solid var(--border);background:var(--bg3)}
+#loadOverlay{position:fixed;inset:0;background:rgba(245,247,250,.92);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:1000}
+#loadOverlay .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px}
 @keyframes spin{to{transform:rotate(360deg)}}
-#loadOverlay .msg{color:var(--text);font-size:14px}
-
-/* ═══ EMPTY STATE ════════════════════════════ */
 #emptyState{padding:60px;text-align:center;color:var(--text2)}
 #emptyState .big{font-size:48px;margin-bottom:12px}
-
-/* ═══ SCROLLBAR ══════════════════════════════ */
 ::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 </style>
 </head>
 <body>
 
-<!-- LOCAL WARNING BANNER -->
-<div id="localWarning" style="display:none;background:#fff3cd;border:2px solid #f0883e;color:#7d4e00;
-  padding:14px 20px;font-size:13px;font-weight:500;text-align:center;position:sticky;top:0;z-index:200">
-  ⚠️ <strong>File aperto in locale</strong> — I proxy CORS non funzionano con <code>file://</code> (403 su tutti).
-  Carica il file su <strong>GitHub Pages</strong> e apri da lì:
-  <a href="https://giorgiogoldoni.github.io/RAPTOR_One.html" target="_blank" 
-     style="color:#0969da;font-weight:700;margin-left:6px">
-    → giorgiogoldoni.github.io/RAPTOR_One.html
-  </a>
-</div>
-
-<!-- ═══ TABLE MODE ═══════════════════════════════════════════════════ -->
 <div id="tableMode">
-
-<!-- HEADER -->
 <div id="header">
-  <div>
-    <div class="logo">🦅 RAPTOR ONE</div>
-    <div class="sub">KAMA · ER · AO · RSI · Trendycator · Mean Reversion</div>
-  </div>
+  <div><div class="logo">🦅 RAPTOR ONE</div><div class="sub">KAMA · ER · AO · RSI · Trendycator · Mean Reversion</div></div>
   <div class="spacer"></div>
   <div class="hbadge">Ticker: <span id="hTotal">—</span></div>
   <div class="hbadge">🟢 <span id="hLong">—</span> | 🔵 <span id="hEarly">—</span> | 🟡 <span id="hWatch">—</span></div>
   <div class="hbadge">⛔ <span id="hStop">—</span> | 🔴 <span id="hUscita">—</span></div>
-  <select id="srcSelect">
-    <option value="yahoo">📊 Yahoo Finance (694 ETF)</option>
-    <option value="stooq">🇪🇺 Stooq EU (641 ETF)</option>
-  </select>
-  <button id="btnReload" onclick="loadFromJSON()" title="Ricarica dati da GitHub">🔄 Aggiorna</button>
-  <button id="btnRun" onclick="startScan()" title="Scan manuale via proxy">⚡ CALCOLA</button>
+  <select id="srcSelect"><option value="yahoo">📊 Yahoo Finance (694 ETF)</option><option value="stooq">🇪🇺 Stooq EU (641 ETF)</option></select>
+  <button id="btnReload" onclick="loadFromJSON()">🔄 Aggiorna</button>
+  <button id="btnRun" onclick="startScan()">⚡ CALCOLA</button>
   <button id="btnExcel" onclick="exportExcel()">📥 Excel</button>
-  <button id="btnSpecsTable" onclick="openSpecs()" title="Specifiche tecniche indicatori" style="background:#fff8c5;border:1px solid #7d4e00;color:#7d4e00;padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;">📄 Specifiche</button>
+  <button onclick="openSpecs()" style="background:#fff8c5;border:1px solid #7d4e00;color:#7d4e00;padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;">📄 Specifiche</button>
 </div>
 
-<!-- TIMESTAMP / SMART REFRESH BAR -->
 <div id="tsBar">
   <span id="tsText">⏳ Caricamento dati in corso...</span>
   <button id="smartToggle" onclick="toggleSmart()">🔄 Smart Refresh OFF</button>
   <span id="countdown"></span>
 </div>
 
-<!-- PROGRESS -->
 <div id="progressWrap">
   <div id="progressBg"><div id="progressBar"></div></div>
-  <div id="progressInfo">
-    <span id="progressTxt">Inizializzazione...</span>
-    <span id="progressTicker"></span>
-  </div>
+  <div id="progressInfo"><span id="progressTxt">Inizializzazione...</span><span id="progressTicker"></span></div>
 </div>
 
-<!-- FILTER ROW 1: Segnali -->
 <div class="filter-section">
-  <div class="filter-row" id="sigRow">
+  <div class="filter-row">
     <span class="filter-label">Segnale:</span>
     <button class="btn-sig active" data-sig="ALL" onclick="setSig('ALL',this)">📋 Tutti</button>
     <button class="btn-sig" data-sig="LONG" onclick="setSig('LONG',this)">🟢 LONG</button>
@@ -259,9 +145,7 @@ tr:hover td{background:#f0f6ff}
     <button class="btn-sig" data-sig="USCITA" onclick="setSig('USCITA',this)">🔴 USCITA</button>
     <button class="btn-sig" data-sig="ATTENZIONE" onclick="setSig('ATTENZIONE',this)">🟡 ATTENZIONE</button>
   </div>
-
-  <!-- FILTER ROW 2: Filtri combinati -->
-  <div class="filter-row" style="margin-top:6px" id="comboRow">
+  <div class="filter-row" style="margin-top:6px">
     <span class="filter-label">Combinati:</span>
     <button class="btn-combo" data-combo="FRESCHI" onclick="setCombo('FRESCHI',this)">🆕 Freschi &amp; Forti</button>
     <button class="btn-combo" data-combo="LONGPURI" onclick="setCombo('LONGPURI',this)">🎯 LONG Puri</button>
@@ -272,8 +156,6 @@ tr:hover td{background:#f0f6ff}
     <button class="btn-combo" data-combo="ESPLOSIVI" onclick="setCombo('ESPLOSIVI',this)">🌊 Esplosivi</button>
     <button class="btn-combo" data-combo="TOP10" onclick="setCombo('TOP10',this)">🏆 Top 10</button>
   </div>
-
-  <!-- FILTER ROW 3: Categorie (collassate) -->
   <div style="margin-top:6px;display:flex;align-items:center;gap:6px">
     <button id="btnToggleCat" onclick="toggleCat()">▼ Categorie</button>
     <span id="catActiveLabel" style="font-size:11px;color:var(--blue)"></span>
@@ -299,50 +181,30 @@ tr:hover td{background:#f0f6ff}
   </div>
 </div>
 
-<!-- TABLE -->
 <div id="tableWrap">
-  <div id="emptyState">
-    <div class="big">🦅</div>
-    <div style="font-size:16px;color:var(--text);margin-bottom:8px">RAPTOR One pronto</div>
-    <div>Seleziona la fonte dati e premi <strong>⚡ CALCOLA</strong> per avviare lo scan</div>
-  </div>
+  <div id="emptyState"><div class="big">🦅</div><div style="font-size:16px;color:var(--text);margin-bottom:8px">RAPTOR One pronto</div><div>Seleziona la fonte dati e premi <strong>⚡ CALCOLA</strong> per avviare lo scan</div></div>
   <table id="mainTable" style="display:none">
-    <thead>
-      <tr>
-        <th onclick="sortBy('ticker')">Ticker</th>
-        <th onclick="sortBy('nome')">Nome ETF</th>
-        <th onclick="sortBy('categoria')">Cat</th>
-        <th onclick="sortBy('segnale')">Segnale</th>
-        <th onclick="sortBy('score')">Score</th>
-        <th onclick="sortBy('trendycator')">Trend</th>
-        <th onclick="sortBy('price')">Prezzo</th>
-        <th onclick="sortBy('er')">ER</th>
-        <th onclick="sortBy('baff')">Baff</th>
-        <th onclick="sortBy('pkPct')">K%</th>
-        <th onclick="sortBy('aoPos')">AO</th>
-        <th onclick="sortBy('rsi')">RSI</th>
-        <th onclick="sortBy('perfSett')">Sett%</th>
-        <th onclick="sortBy('perfMese')">Mese%</th>
-        <th onclick="sortBy('volRatio')">VOL</th>
-        <th onclick="sortBy('mmAlign')">MM</th>
-        <th onclick="sortBy('cross')">GG Ing</th>
-        <th onclick="sortBy('entryDate')">Data Ing</th>
-        <th>📈</th>
-      </tr>
-    </thead>
+    <thead><tr>
+      <th onclick="sortBy('ticker')">Ticker</th><th onclick="sortBy('nome')">Nome ETF</th>
+      <th onclick="sortBy('categoria')">Cat</th><th onclick="sortBy('segnale')">Segnale</th>
+      <th onclick="sortBy('score')">Score</th><th onclick="sortBy('trendycator')">Trend</th>
+      <th onclick="sortBy('price')">Prezzo</th><th onclick="sortBy('er')">ER</th>
+      <th onclick="sortBy('baff')">Baff</th><th onclick="sortBy('pkPct')">K%</th>
+      <th onclick="sortBy('aoPos')">AO</th><th onclick="sortBy('rsi')">RSI</th>
+      <th onclick="sortBy('perfSett')">Sett%</th><th onclick="sortBy('perfMese')">Mese%</th>
+      <th onclick="sortBy('volRatio')">VOL</th><th onclick="sortBy('mmAlign')">MM</th>
+      <th onclick="sortBy('cross')">GG Ing</th><th onclick="sortBy('entryDate')">Data Ing</th>
+      <th>📈</th>
+    </tr></thead>
     <tbody id="tableBody"></tbody>
   </table>
 </div>
+</div>
 
-</div><!-- end tableMode -->
-
-<!-- ═══ CHART MODE ═══════════════════════════════════════════════════ -->
+<!-- CHART MODE -->
 <div id="chartMode">
   <div id="chartHeader">
-    <div>
-      <div id="chartTitle">—</div>
-      <div id="chartSub"></div>
-    </div>
+    <div><div id="chartTitle">—</div><div id="chartSub"></div></div>
     <div style="flex:1"></div>
     <button class="tf-btn" data-tf="5h" onclick="setTF(this)">5h</button>
     <button class="tf-btn" data-tf="1d" onclick="setTF(this)">1g</button>
@@ -351,9 +213,9 @@ tr:hover td{background:#f0f6ff}
     <button class="tf-btn" data-tf="3m" onclick="setTF(this)">3m</button>
     <button class="tf-btn" data-tf="6m" onclick="setTF(this)">6m</button>
     <button class="tf-btn" data-tf="1y" onclick="setTF(this)">1a</button>
-    <button class="tf-btn" id="btnSpecs" onclick="openSpecs()" style="margin-left:8px;background:#fff8c5;border-color:#7d4e00;color:#7d4e00;">📄 Specifiche</button>
+    <button class="tf-btn" onclick="openSpecs()" style="margin-left:8px;background:#fff8c5;border-color:#7d4e00;color:#7d4e00;">📄 Specifiche</button>
+    <button class="tf-btn" onclick="backToTable()" style="margin-left:4px;">← Tabella</button>
   </div>
-
   <div id="infoBar">
     <div class="info-card"><div class="lbl">Prezzo</div><div class="val" id="ic-price">—</div><div class="sub" id="ic-chg">—</div></div>
     <div class="info-card"><div class="lbl">KAMA</div><div class="val" id="ic-kama">—</div><div class="sub" id="ic-kgap">—</div></div>
@@ -365,548 +227,94 @@ tr:hover td{background:#f0f6ff}
     <div class="info-card"><div class="lbl">Trailing Stop</div><div class="val" id="ic-trail">—</div><div class="sub" id="ic-trailpct">—</div></div>
     <div class="info-card"><div class="lbl">Segnale</div><div class="val" id="ic-sig">—</div><div class="sub" id="ic-mr">—</div></div>
   </div>
-
   <div id="panels">
-    <div class="panel"><div class="panel-title">P1 — PREZZO + KAMA + MM20 + MM50 + MM200 · Segnali</div>
-      <div style="position:relative;height:260px;width:100%"><canvas id="p1"></canvas></div></div>
-    <div class="panel" id="panelHA"><div class="panel-title">P2 — HEIKIN-ASHI · Trend filtrato</div>
-      <div style="position:relative;height:180px;width:100%"><canvas id="p2"></canvas></div></div>
-    <div class="panel" id="panelBaf">
+    <div class="panel"><div class="panel-title">P1 — PREZZO + KAMA + MM20 + MM50 + MM200</div><div style="position:relative;height:260px"><canvas id="p1"></canvas></div></div>
+    <div class="panel"><div class="panel-title">P2 — HEIKIN-ASHI</div><div style="position:relative;height:180px"><canvas id="p2"></canvas></div></div>
+    <div class="panel">
       <div class="panel-title" style="display:flex;justify-content:space-between;align-items:center;">
-        <span>BAFFETTI AO — Momentum consecutivo · Segnale COMPRA / FUORI</span>
+        <span>BAFFETTI AO — Momentum consecutivo</span>
         <span id="bafSignal" style="font-size:12px;font-weight:700;padding:2px 10px;border-radius:10px;"></span>
       </div>
-      <div style="position:relative;height:90px;width:100%"><canvas id="pBaf"></canvas></div>
+      <div style="position:relative;height:90px"><canvas id="pBaf"></canvas></div>
       <div id="bafLegend" style="padding:4px 12px 8px;font-size:11px;color:#57606a;display:flex;gap:16px;flex-wrap:wrap;"></div>
     </div>
-    <div class="panel"><div class="panel-title">P3 — AO (Awesome Oscillator)</div>
-      <div style="position:relative;height:120px;width:100%"><canvas id="p3"></canvas></div></div>
-    <div class="panel"><div class="panel-title">P4 — RSI(14)</div>
-      <div style="position:relative;height:100px;width:100%"><canvas id="p4"></canvas></div></div>
-    <div class="panel"><div class="panel-title">P5 — VOLUME · vs Media 20gg</div>
-      <div style="position:relative;height:80px;width:100%"><canvas id="p5"></canvas></div></div>
+    <div class="panel"><div class="panel-title">P3 — AO (Awesome Oscillator)</div><div style="position:relative;height:120px"><canvas id="p3"></canvas></div></div>
+    <div class="panel"><div class="panel-title">P4 — RSI(14)</div><div style="position:relative;height:100px"><canvas id="p4"></canvas></div></div>
+    <div class="panel"><div class="panel-title">P5 — VOLUME vs Media 20gg</div><div style="position:relative;height:80px"><canvas id="p5"></canvas></div></div>
   </div>
 </div>
 
 <!-- SPECS MODAL -->
 <div id="specsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:3000;overflow-y:auto;padding:20px;">
-  <div style="background:#fff;max-width:860px;margin:0 auto;border-radius:12px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.35);">
-    <div style="background:#0969da;color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;">
-      <div>
-        <div style="font-size:17px;font-weight:700;">📄 RAPTOR One — Specifiche Tecniche</div>
-        <div style="font-size:12px;opacity:0.8;margin-top:2px;">Indicatori · Segnali · Score · Logica operativa</div>
-      </div>
-      <button onclick="closeSpecs()" style="background:rgba(255,255,255,0.2);border:none;color:#fff;font-size:18px;cursor:pointer;border-radius:6px;padding:4px 12px;line-height:1;">✕</button>
+  <div style="background:#fff;max-width:700px;margin:0 auto;border-radius:12px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.35);">
+    <div style="background:#0969da;color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-size:16px;font-weight:700;">📄 RAPTOR One — Specifiche Tecniche</div>
+      <button onclick="closeSpecs()" style="background:rgba(255,255,255,0.2);border:none;color:#fff;font-size:18px;cursor:pointer;border-radius:6px;padding:4px 12px;">✕</button>
     </div>
-    <div style="padding:20px 24px;font-size:13px;color:#24292f;line-height:1.7;">
-
-      <h3 style="color:#0969da;border-bottom:2px solid #ddf4ff;padding-bottom:6px;margin-top:0;">🔢 Indicatori calcolati</h3>
-      <table style="width:100%;border-collapse:collapse;margin-bottom:18px;font-size:12px;">
-        <thead><tr style="background:#f6f8fa;"><th style="padding:7px 10px;text-align:left;border:1px solid #d0d7de;">Indicatore</th><th style="padding:7px 10px;text-align:left;border:1px solid #d0d7de;">Parametri</th><th style="padding:7px 10px;text-align:left;border:1px solid #d0d7de;">Significato</th></tr></thead>
-        <tbody>
-          <tr><td style="padding:6px 10px;border:1px solid #d0d7de;font-weight:600;">KAMA</td><td style="padding:6px 10px;border:1px solid #d0d7de;">n=10, fast=2, slow=30</td><td style="padding:6px 10px;border:1px solid #d0d7de;">Media mobile adattiva. Si muove veloce in trend, lenta in laterale.</td></tr>
-          <tr style="background:#f6f8fa;"><td style="padding:6px 10px;border:1px solid #d0d7de;font-weight:600;">ER (Efficiency Ratio)</td><td style="padding:6px 10px;border:1px solid #d0d7de;">n=10, range 0–1</td><td style="padding:6px 10px;border:1px solid #d0d7de;">&gt;0.5 = trend forte · &lt;0.3 = laterale/caotico</td></tr>
-          <tr><td style="padding:6px 10px;border:1px solid #d0d7de;font-weight:600;">AO (Awesome Oscillator)</td><td style="padding:6px 10px;border:1px solid #d0d7de;">SMA5 − SMA34 midpoint</td><td style="padding:6px 10px;border:1px solid #d0d7de;">Momentum: positivo = forza rialzista · negativo = ribassista</td></tr>
-          <tr style="background:#f6f8fa;"><td style="padding:6px 10px;border:1px solid #d0d7de;font-weight:600;">Baffetti AO</td><td style="padding:6px 10px;border:1px solid #d0d7de;">n barre AO consecutive crescenti</td><td style="padding:6px 10px;border:1px solid #d0d7de;">≥3 = momentum in accelerazione · segnale COMPRA</td></tr>
-          <tr><td style="padding:6px 10px;border:1px solid #d0d7de;font-weight:600;">RSI</td><td style="padding:6px 10px;border:1px solid #d0d7de;">n=14, range 0–100</td><td style="padding:6px 10px;border:1px solid #d0d7de;">&gt;70 ipercomprato · &lt;30 ipervenduto · 50 equilibrio</td></tr>
-          <tr style="background:#f6f8fa;"><td style="padding:6px 10px;border:1px solid #d0d7de;font-weight:600;">Trendycator</td><td style="padding:6px 10px;border:1px solid #d0d7de;">EMA21 vs EMA55</td><td style="padding:6px 10px;border:1px solid #d0d7de;">VERDE = uptrend · ROSSO = downtrend · GRIGIO = incerto</td></tr>
-          <tr><td style="padding:6px 10px;border:1px solid #d0d7de;font-weight:600;">K%</td><td style="padding:6px 10px;border:1px solid #d0d7de;">(Prezzo/KAMA−1)×100</td><td style="padding:6px 10px;border:1px solid #d0d7de;">Distanza % del prezzo dalla KAMA. Positivo = sopra KAMA</td></tr>
-          <tr style="background:#f6f8fa;"><td style="padding:6px 10px;border:1px solid #d0d7de;font-weight:600;">MM Align</td><td style="padding:6px 10px;border:1px solid #d0d7de;">Prezzo &gt; MM20 &gt; MM50 &gt; MM200</td><td style="padding:6px 10px;border:1px solid #d0d7de;">Allineamento bullish completo. Necessario per segnale LONG</td></tr>
-          <tr><td style="padding:6px 10px;border:1px solid #d0d7de;font-weight:600;">Heikin Ashi</td><td style="padding:6px 10px;border:1px solid #d0d7de;">OHLC filtrato</td><td style="padding:6px 10px;border:1px solid #d0d7de;">Candele HA: verde pieno = trend forte · rosso pieno = pressione vendita</td></tr>
-          <tr style="background:#f6f8fa;"><td style="padding:6px 10px;border:1px solid #d0d7de;font-weight:600;">ATR</td><td style="padding:6px 10px;border:1px solid #d0d7de;">n=14</td><td style="padding:6px 10px;border:1px solid #d0d7de;">Volatilità media. Usato per calcolare il Trailing Stop (Prezzo − 2×ATR)</td></tr>
-        </tbody>
-      </table>
-
-      <h3 style="color:#1a7f37;border-bottom:2px solid #dafbe1;padding-bottom:6px;">🟢 Segnali di ENTRATA</h3>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">
-        <div style="background:#dafbe1;border:1px solid #1a7f37;border-radius:8px;padding:12px;">
-          <div style="font-weight:700;color:#1a7f37;margin-bottom:6px;font-size:14px;">🟢 LONG — Segnale forte</div>
-          <div style="font-size:12px;">✓ Trendycator VERDE<br>✓ Prezzo &gt; KAMA<br>✓ ER ≥ 0.50<br>✓ Baffetti ≥ 3<br>✓ MM20 &gt; MM50 &gt; MM200</div>
-        </div>
-        <div style="background:#ddf4ff;border:1px solid #0969da;border-radius:8px;padding:12px;">
-          <div style="font-weight:700;color:#0969da;margin-bottom:6px;font-size:14px;">🔵 EARLY — Anticipo trend</div>
-          <div style="font-size:12px;">✓ Prezzo &gt; KAMA<br>✓ Baffetti ≥ 3<br>✓ Trendycator VERDE o GRIGIO<br><em style="opacity:0.6;">MM align non richiesto</em></div>
-        </div>
-        <div style="background:#fff8c5;border:1px solid #7d4e00;border-radius:8px;padding:12px;">
-          <div style="font-weight:700;color:#7d4e00;margin-bottom:6px;font-size:14px;">🟡 WATCH — Osservazione</div>
-          <div style="font-size:12px;">✓ Prezzo &gt; KAMA<br>✓ Baffetti ≥ 1<br>✓ Trendycator VERDE o GRIGIO<br><em style="opacity:0.6;">Momentum appena iniziato</em></div>
-        </div>
-        <div style="background:#fff1e5;border:1px solid #bc4c00;border-radius:8px;padding:12px;">
-          <div style="font-weight:700;color:#bc4c00;margin-bottom:6px;font-size:14px;">🟠 MEAN REVERSION</div>
-          <div style="font-size:12px;">✓ ER &lt; 0.30 (laterale)<br>✓ RSI &lt; 30 (ipervenduto)<br>✓ AO in risalita<br>✓ Prezzo vicino/sotto KAMA</div>
-        </div>
-      </div>
-
-      <h3 style="color:#cf222e;border-bottom:2px solid #ffebe9;padding-bottom:6px;">🔴 Segnali di USCITA</h3>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px;">
-        <div style="background:#ffebe9;border:1px solid #cf222e;border-radius:8px;padding:10px;font-size:12px;">
-          <div style="font-weight:700;color:#cf222e;margin-bottom:4px;">⛔ STOP</div>
-          <div>Prezzo &lt; KAMA<br>Trendycator ROSSO<br><em style="opacity:0.7;">Uscita immediata</em></div>
-        </div>
-        <div style="background:#ffebe9;border:1px solid #a40000;border-radius:8px;padding:10px;font-size:12px;">
-          <div style="font-weight:700;color:#a40000;margin-bottom:4px;">🔴 USCITA</div>
-          <div>Prezzo &lt; KAMA<br>Trendycator non ROSSO<br><em style="opacity:0.7;">Inversione probabile</em></div>
-        </div>
-        <div style="background:#fff8c5;border:1px solid #7d4e00;border-radius:8px;padding:10px;font-size:12px;">
-          <div style="font-weight:700;color:#7d4e00;margin-bottom:4px;">⚠️ ATTENZIONE</div>
-          <div>Prezzo &gt; KAMA<br>AO ≤ 0 o Trend GRIGIO<br><em style="opacity:0.7;">Momentum in calo</em></div>
-        </div>
-      </div>
-
-      <h3 style="color:#6e40c9;border-bottom:2px solid #f0e6ff;padding-bottom:6px;">🏆 Formula Score (0–200)</h3>
-      <div style="background:#f6f8fa;border:1px solid #d0d7de;border-radius:8px;padding:14px;font-family:monospace;font-size:12px;margin-bottom:18px;line-height:1.9;">
-        score = ER×30 + min(Baffetti,10)×5 + min(|K%|,5)×3<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ max(−10,min(5,Perf7gg))×4<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ max(−20,min(10,Perf30gg))×2<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ (MM Align ? 10 : 0)<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ (AO &gt; 0 ? 5 : 0)<br>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ (Cross≤3 ? 20 : Cross≤10 ? 12 : Cross≤20 ? 5 : 0)<br>
-        <span style="color:#cf222e;">se Trendycator ROSSO → score × 0.6</span>
-      </div>
-
-      <h3 style="color:#57606a;border-bottom:2px solid #d0d7de;padding-bottom:6px;">⏱️ Timeframe disponibili</h3>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;">
-        <span style="background:#ddf4ff;color:#0969da;border:1px solid #0969da;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:600;">5h — ultime 5 ore (intraday)</span>
-        <span style="background:#ddf4ff;color:#0969da;border:1px solid #0969da;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:600;">1g — ultimo giorno</span>
-        <span style="background:#f6f8fa;color:#57606a;border:1px solid #d0d7de;border-radius:6px;padding:4px 12px;font-size:12px;">1s — ultima settimana</span>
-        <span style="background:#f6f8fa;color:#57606a;border:1px solid #d0d7de;border-radius:6px;padding:4px 12px;font-size:12px;">1m — ultimo mese</span>
-        <span style="background:#f6f8fa;color:#57606a;border:1px solid #d0d7de;border-radius:6px;padding:4px 12px;font-size:12px;">3m — 3 mesi</span>
-        <span style="background:#f6f8fa;color:#57606a;border:1px solid #d0d7de;border-radius:6px;padding:4px 12px;font-size:12px;">6m — 6 mesi</span>
-        <span style="background:#f6f8fa;color:#57606a;border:1px solid #d0d7de;border-radius:6px;padding:4px 12px;font-size:12px;">1a — 1 anno</span>
-      </div>
-      <p style="font-size:11px;color:#57606a;margin:0;">I dati grafici provengono da <strong>raptor_chart.json</strong> generato da GitHub Actions ogni giorno alle 08:00. I timeframe 5h e 1g usano barre orarie; gli altri usano barre giornaliere filtrate.</p>
+    <div style="padding:20px;font-size:13px;line-height:1.8;">
+      <p><strong>KAMA</strong> n=10, fast=2, slow=30 — media mobile adattiva</p>
+      <p><strong>ER</strong> n=10 — &gt;0.5 trend forte, &lt;0.3 laterale</p>
+      <p><strong>AO</strong> SMA5−SMA34 midpoint — momentum</p>
+      <p><strong>Baffetti</strong> barre AO consecutive crescenti — ≥3 segnale COMPRA</p>
+      <p><strong>RSI</strong> n=14 — &gt;70 ipercomprato, &lt;30 ipervenduto</p>
+      <p><strong>Trendycator</strong> EMA21 vs EMA55 — VERDE/ROSSO/GRIGIO</p>
+      <p><strong>Score</strong> = ER×30 + Baf×5 + K%×3 + Perf7×4 + Perf30×2 + MM(10) + AO(5) + Cross(0-20)</p>
+      <p style="color:#cf222e"><strong>Trendycator ROSSO → score × 0.6</strong></p>
+      <br>
+      <p><strong>🟢 LONG</strong>: Trendycator VERDE + Prezzo&gt;KAMA + ER≥0.50 + Baf≥3 + MM align</p>
+      <p><strong>🔵 EARLY</strong>: Prezzo&gt;KAMA + Baf≥3 + VERDE/GRIGIO</p>
+      <p><strong>🟡 WATCH</strong>: Prezzo&gt;KAMA + Baf≥1 + VERDE/GRIGIO</p>
+      <p><strong>⛔ STOP</strong>: Prezzo&lt;KAMA + Trendycator ROSSO</p>
+      <p><strong>🔴 USCITA</strong>: Prezzo&lt;KAMA</p>
     </div>
   </div>
 </div>
 
-<!-- LOADING OVERLAY -->
 <div id="loadOverlay">
   <div class="spinner"></div>
-  <div class="msg" id="loadMsg">Caricamento dati...</div>
+  <div style="color:var(--text);font-size:14px" id="loadMsg">Caricamento...</div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════════
-//  DETECT MODE — chiamato dopo tutte le dichiarazioni
-// ═══════════════════════════════════════════════════════════════════
-// (la chiamata reale è in fondo allo script tramite DOMContentLoaded)
-
-// ═══════════════════════════════════════════════════════════════════
-//  TICKER LIST (Yahoo)
-// ═══════════════════════════════════════════════════════════════════
-const TICKERS_YAHOO=[
-{"y":"IAEX.AS","c":"Paesi","t":"IAEX","n":""},{"y":"TOF.AS","c":"ATTIVO","t":"TOF","n":""},
-{"y":"18MN.DE","c":"Lazy","t":"18MN","n":""},{"y":"7USH.DE","c":"BOND","t":"7USH","n":""},
-{"y":"CBUH.DE","c":"ATTIVO","t":"CBUH","n":""},{"y":"CEB1.DE","c":"BOND","t":"CEB1","n":""},
-{"y":"CEB4.DE","c":"NEW AREA","t":"CEB4","n":""},{"y":"GXDW","c":"Paesi","t":"GXDW","n":""},
-{"y":"DBZB.DE","c":"Lazy","t":"DBZB","n":""},{"y":"EUNY.DE","c":"ATTIVO","t":"EUNY","n":""},
-{"y":"FTGM.DE","c":"ATTIVO","t":"FTGM","n":""},{"y":"IBC5.DE","c":"BOND","t":"IBC5","n":""},
-{"y":"IBCJ.DE","c":"Paesi","t":"IBCJ","n":""},{"y":"IQQ9.DE","c":"NEW AREA","t":"IQQ9","n":""},
-{"y":"IQQF.DE","c":"NEW AREA","t":"IQQF","n":""},{"y":"IS04.DE","c":"BOND","t":"IS04","n":""},
-{"y":"IS3C.DE","c":"Lazy","t":"IS3C","n":""},{"y":"IS3N.DE","c":"Lazy","t":"IS3N","n":""},
-{"y":"IS3U.DE","c":"Paesi","t":"IS3U","n":""},{"y":"ISPA.DE","c":"ATTIVO","t":"ISPA","n":""},
-{"y":"IUSQ.DE","c":"Lazy","t":"IUSQ","n":""},{"y":"IUSS.DE","c":"Paesi","t":"IUSS","n":""},
-{"y":"LCUJ.DE","c":"Lazy","t":"LCUJ","n":""},{"y":"MJMT.DE","c":"ATTIVO","t":"MJMT","n":""},
-{"y":"QDVA.DE","c":"ATTIVO","t":"QDVA","n":""},{"y":"SPP5.DE","c":"BOND","t":"SPP5","n":""},
-{"y":"SPYX.DE","c":"ATTIVO","t":"SPYX","n":""},{"y":"SXR1.DE","c":"Lazy","t":"SXR1","n":""},
-{"y":"SXRT.DE","c":"Lazy","t":"SXRT","n":""},{"y":"SXRU.DE","c":"NEW AREA","t":"SXRU","n":""},
-{"y":"SXRW.DE","c":"Lazy","t":"SXRW","n":""},{"y":"VGWE.DE","c":"ATTIVO","t":"VGWE","n":""},
-{"y":"VUKG.DE","c":"Paesi","t":"VUKG","n":""},{"y":"XBAS.DE","c":"Paesi","t":"XBAS","n":""},
-{"y":"XCS3.DE","c":"Paesi","t":"XCS3","n":""},{"y":"XCS4.DE","c":"Paesi","t":"XCS4","n":""},
-{"y":"XD9E.DE","c":"Lazy","t":"XD9E","n":""},{"y":"XD9U.DE","c":"Lazy","t":"XD9U","n":""},
-{"y":"XDEM.DE","c":"ATTIVO","t":"XDEM","n":""},{"y":"XESD.DE","c":"Paesi","t":"XESD","n":""},
-{"y":"XGIN.DE","c":"Lazy","t":"XGIN","n":""},{"y":"XMKA.DE","c":"Paesi","t":"XMKA","n":""},
-{"y":"XPQP.DE","c":"Paesi","t":"XPQP","n":""},{"y":"XWEM.DE","c":"ATTIVO","t":"XWEM","n":""},
-{"y":"F701.F","c":"ATTIVO","t":"F701","n":""},{"y":"F702.F","c":"ATTIVO","t":"F702","n":""},
-{"y":"F703.F","c":"ATTIVO","t":"F703","n":""},{"y":"IUSN.F","c":"ADVICE","t":"IUSN","n":""},
-{"y":"IVAI.MI","c":"Tematici","t":"IVAI","n":""},{"y":"IVDF.DE","c":"Tematici","t":"IVDF","n":""},
-{"y":"NQSE.F","c":"NEW AREA","t":"NQSE","n":""},{"y":"NTSZ.DE","c":"ATTIVO","t":"NTSZ","n":""},
-{"y":"XMKA.F","c":"NEW AREA","t":"XMKA_F","n":""},{"y":"IEFM.L","c":"ATTIVO","t":"IEFM","n":""},
-{"y":"A01U.MI","c":"BOND","t":"A01U","n":""},{"y":"ACT20.MI","c":"ATTIVO","t":"ACT20","n":""},
-{"y":"ACT60.MI","c":"ATTIVO","t":"ACT60","n":""},{"y":"ACTEQ.MI","c":"ATTIVO","t":"ACTEQ","n":""},
-{"y":"ADLU.MI","c":"BOND","t":"ADLU","n":""},{"y":"AEGE.MI","c":"BOND","t":"AEGE","n":""},
-{"y":"AGEB.MI","c":"BOND","t":"AGEB","n":""},{"y":"AGED.MI","c":"Tematici","t":"AGED","n":""},
-{"y":"AGGH.MI","c":"BOND","t":"AGGH","n":""},{"y":"AI4UJ.MI","c":"Tematici","t":"AI4UJ","n":""},
-{"y":"AIAA.MI","c":"Tematici","t":"AIAA","n":""},{"y":"AIAI.MI","c":"Tematici","t":"AIAI","n":""},
-{"y":"AICU.MI","c":"BOND","t":"AICU","n":""},{"y":"AIGA.MI","c":"Materie","t":"AIGA","n":""},
-{"y":"AIGC.MI","c":"Materie","t":"AIGC","n":""},{"y":"AIGE.MI","c":"Materie","t":"AIGE","n":""},
-{"y":"AIGG.MI","c":"Materie","t":"AIGG","n":""},{"y":"AIGI.MI","c":"Materie","t":"AIGI","n":""},
-{"y":"AIGL.MI","c":"Materie","t":"AIGL","n":""},{"y":"AIGO.MI","c":"Materie","t":"AIGO","n":""},
-{"y":"AIGP.MI","c":"Materie","t":"AIGP","n":""},{"y":"AIGS.MI","c":"Materie","t":"AIGS","n":""},
-{"y":"AINF.MI","c":"Tematici","t":"AINF","n":""},{"y":"AIQE.MI","c":"Tematici","t":"AIQE","n":""},
-{"y":"ALAT.MI","c":"NEW AREA","t":"ALAT","n":""},{"y":"ALUM.MI","c":"Materie","t":"ALUM","n":""},
-{"y":"ANAU.MI","c":"ADVICE","t":"ANAU","n":""},{"y":"AQWA.MI","c":"Tematici","t":"AQWA","n":""},
-{"y":"ARMI.MI","c":"Tematici","t":"ARMI","n":""},{"y":"ARMR.MI","c":"Tematici","t":"ARMR","n":""},
-{"y":"ASRD.MI","c":"BOND","t":"ASRD","n":""},{"y":"AT1.MI","c":"BOND","t":"AT1","n":""},
-{"y":"AUCO.MI","c":"Tematici","t":"AUCO","n":""},{"y":"AUHEUA.MI","c":"Paesi","t":"AUHEUA","n":""},
-{"y":"BATT.MI","c":"Tematici","t":"BATT","n":""},{"y":"BBTR.MI","c":"BOND","t":"BBTR","n":""},
-{"y":"BCHN.MI","c":"Settoriali","t":"BCHN","n":""},{"y":"BENE.MI","c":"Materie","t":"BENE","n":""},
-{"y":"BIODV.MI","c":"Settoriali","t":"BIODV","n":""},{"y":"BIOT.MI","c":"Tematici","t":"BIOT","n":""},
-{"y":"BKCH.MI","c":"Tematici","t":"BKCH","n":""},{"y":"BLTH.MI","c":"Tematici","t":"BLTH","n":""},
-{"y":"BNK.MI","c":"Settoriali","t":"BNK","n":""},{"y":"BNKE.MI","c":"Settoriali","t":"BNKE","n":""},
-{"y":"BOTZ.MI","c":"Tematici","t":"BOTZ","n":""},{"y":"BRENT.MI","c":"Materie","t":"BRENT","n":""},
-{"y":"BRES.MI","c":"Settoriali","t":"BRES","n":""},{"y":"BRIJ.MI","c":"Tematici","t":"BRIJ","n":""},
-{"y":"BRND.MI","c":"Materie","t":"BRND","n":""},{"y":"BRNT.MI","c":"Materie","t":"BRNT","n":""},
-{"y":"BSRIC.MI","c":"BOND","t":"BSRIC","n":""},{"y":"BT27.MI","c":"BOND","t":"BT27","n":""},
-{"y":"BTC.MI","c":"Tematici","t":"BTC","n":""},{"y":"BTECH.MI","c":"Tematici","t":"BTECH","n":""},
-{"y":"BTECJ.MI","c":"Tematici","t":"BTECJ","n":""},{"y":"BTP10.MI","c":"BOND","t":"BTP10","n":""},
-{"y":"BUG.MI","c":"Tematici","t":"BUG","n":""},{"y":"C40.MI","c":"Paesi","t":"C40","n":""},
-{"y":"CAHEUA.MI","c":"NEW AREA","t":"CAHEUA","n":""},{"y":"CARB.MI","c":"Materie","t":"CARB","n":""},
-{"y":"CAUT.MI","c":"Tematici","t":"CAUT","n":""},{"y":"CBSUSA.MI","c":"BOND","t":"CBSUSA","n":""},
-{"y":"CCEUAS.MI","c":"Materie","t":"CCEUAS","n":""},{"y":"CCUSAS.MI","c":"Materie","t":"CCUSAS","n":""},
-{"y":"CHIP.MI","c":"ADVICE","t":"CHIP","n":""},{"y":"CHM.MI","c":"Settoriali","t":"CHM","n":""},
-{"y":"CIBR.MI","c":"ADVICE","t":"CIBR","n":""},{"y":"CIT.MI","c":"Tematici","t":"CIT","n":""},
-{"y":"CITE.MI","c":"Tematici","t":"CITE","n":""},{"y":"CITY.MI","c":"Tematici","t":"CITY","n":""},
-{"y":"CLIP.MI","c":"BOND","t":"CLIP","n":""},{"y":"CLOU.MI","c":"Tematici","t":"CLOU","n":""},
-{"y":"CMOC.MI","c":"Materie","t":"CMOC","n":""},{"y":"CMOD.MI","c":"Materie","t":"CMOD","n":""},
-{"y":"CMOE.MI","c":"Materie","t":"CMOE","n":""},{"y":"CN1.MI","c":"Paesi","t":"CN1","n":""},
-{"y":"CO2.MI","c":"Materie","t":"CO2","n":""},{"y":"COCO.MI","c":"Materie","t":"COCO","n":""},
-{"y":"COFF.MI","c":"Materie","t":"COFF","n":""},{"y":"COMF.MI","c":"Materie","t":"COMF","n":""},
-{"y":"COMH.MI","c":"Materie","t":"COMH","n":""},{"y":"COMO.MI","c":"Materie","t":"COMO","n":""},
-{"y":"COPA.MI","c":"Materie","t":"COPA","n":""},{"y":"COPM.MI","c":"Tematici","t":"COPM","n":""},
-{"y":"COPR.MI","c":"Tematici","t":"COPR","n":""},{"y":"COPX.MI","c":"Tematici","t":"COPX","n":""},
-{"y":"CORN.MI","c":"Materie","t":"CORN","n":""},{"y":"COTN.MI","c":"Materie","t":"COTN","n":""},
-{"y":"CROP.MI","c":"Tematici","t":"CROP","n":""},{"y":"CRRY.MI","c":"Materie","t":"CRRY","n":""},
-{"y":"CRUD.MI","c":"Materie","t":"CRUD","n":""},{"y":"CSBGE7.MI","c":"BOND","t":"CSBGE7","n":""},
-{"y":"CSBGU3.MI","c":"BOND","t":"CSBGU3","n":""},{"y":"CSBGU7.MI","c":"BOND","t":"CSBGU7","n":""},
-{"y":"CSCA.MI","c":"NEW AREA","t":"CSCA","n":""},{"y":"CSEMAS.MI","c":"NEW AREA","t":"CSEMAS","n":""},
-{"y":"CSMIB.MI","c":"Paesi","t":"CSMIB","n":""},{"y":"CSNDX.MI","c":"Paesi","t":"CSNDX","n":""},
-{"y":"CSPXJ.MI","c":"NEW AREA","t":"CSPXJ","n":""},{"y":"CSSPX.MI","c":"ADVICE","t":"CSSPX","n":""},
-{"y":"CSUS.MI","c":"ADVICE","t":"CSUS","n":""},{"y":"CSUSS.MI","c":"ADVICE","t":"CSUSS","n":""},
-{"y":"CTEK.MI","c":"Tematici","t":"CTEK","n":""},{"y":"CURE.MI","c":"Tematici","t":"CURE","n":""},
-{"y":"CWE.MI","c":"Settoriali","t":"CWE","n":""},{"y":"CYBO.MI","c":"Tematici","t":"CYBO","n":""},
-{"y":"CYBR.MI","c":"Settoriali","t":"CYBR","n":""},{"y":"DAPP.MI","c":"Tematici","t":"DAPP","n":""},
-{"y":"DEFS.MI","c":"Settoriali","t":"DEFS","n":""},{"y":"DEMR.MI","c":"ATTIVO","t":"DEMR","n":""},
-{"y":"DFND.MI","c":"Tematici","t":"DFND","n":""},{"y":"DFNS.MI","c":"Tematici","t":"DFNS","n":""},
-{"y":"DGTL.MI","c":"Tematici","t":"DGTL","n":""},{"y":"DISW.MI","c":"Settoriali","t":"DISW","n":""},
-{"y":"DJE.MI","c":"Paesi","t":"DJE","n":""},{"y":"DMAT.MI","c":"Tematici","t":"DMAT","n":""},
-{"y":"DOCT.MI","c":"Tematici","t":"DOCT","n":""},{"y":"DPAY.MI","c":"Tematici","t":"DPAY","n":""},
-{"y":"DRVE.MI","c":"Tematici","t":"DRVE","n":""},{"y":"DXJF.MI","c":"ATTIVO","t":"DXJF","n":""},
-{"y":"EALU.MI","c":"Materie","t":"EALU","n":""},{"y":"EBIZ.MI","c":"Tematici","t":"EBIZ","n":""},
-{"y":"EBRT.MI","c":"Materie","t":"EBRT","n":""},{"y":"EBUY.MI","c":"Tematici","t":"EBUY","n":""},
-{"y":"ECAR.MI","c":"Tematici","t":"ECAR","n":""},{"y":"ECEH.MI","c":"Materie","t":"ECEH","n":""},
-{"y":"ECO.MI","c":"BOND","t":"ECO","n":""},{"y":"ECOF.MI","c":"Materie","t":"ECOF","n":""},
-{"y":"ECOM.MI","c":"Tematici","t":"ECOM","n":""},{"y":"ECOP.MI","c":"Materie","t":"ECOP","n":""},
-{"y":"ECR1.MI","c":"BOND","t":"ECR1","n":""},{"y":"ECRD.MI","c":"Materie","t":"ECRD","n":""},
-{"y":"ECRN.MI","c":"Materie","t":"ECRN","n":""},{"y":"ECRP3.MI","c":"BOND","t":"ECRP3","n":""},
-{"y":"ECTN.MI","c":"Materie","t":"ECTN","n":""},{"y":"EDOC.MI","c":"Tematici","t":"EDOC","n":""},
-{"y":"EEA.MI","c":"Tematici","t":"EEA","n":""},{"y":"EEIA.MI","c":"ATTIVO","t":"EEIA","n":""},
-{"y":"EENG.MI","c":"Settoriali","t":"EENG","n":""},{"y":"EFCM.MI","c":"Materie","t":"EFCM","n":""},
-{"y":"EGEHE.MI","c":"Settoriali","t":"EGEHE","n":""},{"y":"EGOV.MI","c":"BOND","t":"EGOV","n":""},
-{"y":"EHYA.MI","c":"BOND","t":"EHYA","n":""},{"y":"EIMI.MI","c":"ADVICE","t":"EIMI","n":""},
-{"y":"EIMT.MI","c":"Materie","t":"EIMT","n":""},{"y":"ELCR.MI","c":"Tematici","t":"ELCR","n":""},
-{"y":"EM1015.MI","c":"BOND","t":"EM1015","n":""},{"y":"EM35.MI","c":"BOND","t":"EM35","n":""},
-{"y":"EM710.MI","c":"BOND","t":"EM710","n":""},{"y":"EMGH.MI","c":"BOND","t":"EMGH","n":""},
-{"y":"EMI.MI","c":"BOND","t":"EMI","n":""},{"y":"EMOVE.MI","c":"Tematici","t":"EMOVE","n":""},
-{"y":"EMOVJ.MI","c":"Tematici","t":"EMOVJ","n":""},{"y":"EMQQ.MI","c":"Settoriali","t":"EMQQ","n":""},
-{"y":"ENCO.MI","c":"Materie","t":"ENCO","n":""},{"y":"ENERW.MI","c":"Settoriali","t":"ENERW","n":""},
-{"y":"ENGS.MI","c":"Materie","t":"ENGS","n":""},{"y":"ENIK.MI","c":"Materie","t":"ENIK","n":""},
-{"y":"ENRG.MI","c":"Settoriali","t":"ENRG","n":""},{"y":"ENTR.MI","c":"Materie","t":"ENTR","n":""},
-{"y":"EPRA.MI","c":"Tematici","t":"EPRA","n":""},{"y":"EPRE.MI","c":"Tematici","t":"EPRE","n":""},
-{"y":"EROX.MI","c":"ADVICE","t":"EROX","n":""},{"y":"ESGO.MI","c":"Tematici","t":"ESGO","n":""},
-{"y":"ESOY.MI","c":"Materie","t":"ESOY","n":""},{"y":"ESPO.MI","c":"Tematici","t":"ESPO","n":""},
-{"y":"ESPY.MI","c":"Tematici","t":"ESPY","n":""},{"y":"EST.MI","c":"NEW AREA","t":"EST","n":""},
-{"y":"ESUG.MI","c":"Materie","t":"ESUG","n":""},{"y":"ETFCRP.MI","c":"BOND","t":"ETFCRP","n":""},
-{"y":"EUC.MI","c":"BOND","t":"EUC","n":""},{"y":"EUES.MI","c":"BOND","t":"EUES","n":""},
-{"y":"EWAT.MI","c":"Materie","t":"EWAT","n":""},{"y":"EXS1.MI","c":"Paesi","t":"EXS1","n":""},
-{"y":"EXXY.MI","c":"Materie","t":"EXXY","n":""},{"y":"EZNC.MI","c":"Materie","t":"EZNC","n":""},
-{"y":"FAMAMW.MI","c":"Tematici","t":"FAMAMW","n":""},{"y":"FAMMAI.MI","c":"Tematici","t":"FAMMAI","n":""},
-{"y":"FAMMWF.MI","c":"Tematici","t":"FAMMWF","n":""},{"y":"FAMMWS.MI","c":"Tematici","t":"FAMMWS","n":""},
-{"y":"FAMTEL.MI","c":"Tematici","t":"FAMTEL","n":""},{"y":"FAMWCS.MI","c":"Tematici","t":"FAMWCS","n":""},
-{"y":"FCRU.MI","c":"Materie","t":"FCRU","n":""},{"y":"FGEA.MI","c":"ATTIVO","t":"FGEA","n":""},
-{"y":"FINSW.MI","c":"Settoriali","t":"FINSW","n":""},{"y":"FINX.MI","c":"Tematici","t":"FINX","n":""},
-{"y":"FLUSA.MI","c":"BOND","t":"FLUSA","n":""},{"y":"FLXI.MI","c":"Paesi","t":"FLXI","n":""},
-{"y":"FLXT.MI","c":"Paesi","t":"FLXT","n":""},{"y":"FLXU.MI","c":"Paesi","t":"FLXU","n":""},
-{"y":"FMI.MI","c":"Paesi","t":"FMI","n":""},{"y":"FOFD.MI","c":"Tematici","t":"FOFD","n":""},
-{"y":"FOO.MI","c":"Settoriali","t":"FOO","n":""},{"y":"FOOD.MI","c":"Settoriali","t":"FOOD","n":""},
-{"y":"FUSU.MI","c":"ATTIVO","t":"FUSU","n":""},{"y":"GAGG.MI","c":"BOND","t":"GAGG","n":""},
-{"y":"GAGH.MI","c":"BOND","t":"GAGH","n":""},{"y":"GAS.MI","c":"Materie","t":"GAS","n":""},
-{"y":"GASRI.MI","c":"BOND","t":"GASRI","n":""},{"y":"GCLE.MI","c":"Tematici","t":"GCLE","n":""},
-{"y":"GCVE.MI","c":"BOND","t":"GCVE","n":""},{"y":"GDIG.MI","c":"Tematici","t":"GDIG","n":""},
-{"y":"GDX.MI","c":"Tematici","t":"GDX","n":""},{"y":"GDXJ.MI","c":"Tematici","t":"GDXJ","n":""},
-{"y":"GENDEE.MI","c":"Tematici","t":"GENDEE","n":""},{"y":"GLUG.MI","c":"Tematici","t":"GLUG","n":""},
-{"y":"GLUX.MI","c":"Tematici","t":"GLUX","n":""},{"y":"GNOM.MI","c":"Tematici","t":"GNOM","n":""},
-{"y":"GOAI.MI","c":"Tematici","t":"GOAI","n":""},{"y":"GOVA.MI","c":"BOND","t":"GOVA","n":""},
-{"y":"GRC.MI","c":"Paesi","t":"GRC","n":""},{"y":"GRCTB.MI","c":"Settoriali","t":"GRCTB","n":""},
-{"y":"GREAL.MI","c":"Settoriali","t":"GREAL","n":""},{"y":"GSCE.MI","c":"Materie","t":"GSCE","n":""},
-{"y":"GSM.MI","c":"Tematici","t":"GSM","n":""},{"y":"HDRO.MI","c":"Tematici","t":"HDRO","n":""},
-{"y":"HEAL.MI","c":"Tematici","t":"HEAL","n":""},{"y":"HECB.MI","c":"BOND","t":"HECB","n":""},
-{"y":"HERU.MI","c":"Tematici","t":"HERU","n":""},{"y":"HGAE.MI","c":"BOND","t":"HGAE","n":""},
-{"y":"HIDIJ.MI","c":"ATTIVO","t":"HIDIJ","n":""},{"y":"HLT.MI","c":"Settoriali","t":"HLT","n":""},
-{"y":"HLTW.MI","c":"Settoriali","t":"HLTW","n":""},{"y":"HMXJ.MI","c":"ADVICE","t":"HMXJ","n":""},
-{"y":"HNSC.MI","c":"Tematici","t":"HNSC","n":""},{"y":"HPNA.MI","c":"Settoriali","t":"HPNA","n":""},
-{"y":"HSTE.MI","c":"Paesi","t":"HSTE","n":""},{"y":"HTWO.MI","c":"Tematici","t":"HTWO","n":""},
-{"y":"HUCB.MI","c":"BOND","t":"HUCB","n":""},{"y":"HUST.MI","c":"BOND","t":"HUST","n":""},
-{"y":"HYDE.MI","c":"Tematici","t":"HYDE","n":""},{"y":"HYGN.MI","c":"Tematici","t":"HYGN","n":""},
-{"y":"HYLD.MI","c":"ADVICE","t":"HYLD","n":""},{"y":"IAPD.MI","c":"NEW AREA","t":"IAPD","n":""},
-{"y":"IBZL.MI","c":"Paesi","t":"IBZL","n":""},{"y":"ICBR.MI","c":"Tematici","t":"ICBR","n":""},
-{"y":"IEAA.MI","c":"BOND","t":"IEAA","n":""},{"y":"IEGS.MI","c":"BOND","t":"IEGS","n":""},
-{"y":"IEMB.MI","c":"ADVICE","t":"IEMB","n":""},{"y":"IEMO.MI","c":"ATTIVO","t":"IEMO","n":""},
-{"y":"IJPE.MI","c":"NEW AREA","t":"IJPE","n":""},{"y":"IMIB.MI","c":"Paesi","t":"IMIB","n":""},
-{"y":"INDG.MI","c":"Settoriali","t":"INDG","n":""},{"y":"INDGW.MI","c":"Settoriali","t":"INDGW","n":""},
-{"y":"INDI.MI","c":"Paesi","t":"INDI","n":""},{"y":"INDO.MI","c":"Paesi","t":"INDO","n":""},
-{"y":"INF1A.MI","c":"BOND","t":"INF1A","n":""},{"y":"INFU.MI","c":"BOND","t":"INFU","n":""},
-{"y":"INQQ.MI","c":"Tematici","t":"INQQ","n":""},{"y":"INS.MI","c":"Settoriali","t":"INS","n":""},
-{"y":"ISAC.MI","c":"NEW AREA","t":"ISAC","n":""},{"y":"ISAG.MI","c":"Tematici","t":"ISAG","n":""},
-{"y":"ISPY.MI","c":"Tematici","t":"ISPY","n":""},{"y":"ITBL.MI","c":"Paesi","t":"ITBL","n":""},
-{"y":"IU0E.MI","c":"BOND","t":"IU0E","n":""},{"y":"IUSE.MI","c":"NEW AREA","t":"IUSE","n":""},
-{"y":"IWDE.MI","c":"NEW AREA","t":"IWDE","n":""},{"y":"IWMO.MI","c":"ATTIVO","t":"IWMO","n":""},
-{"y":"IWVL.MI","c":"ADVICE","t":"IWVL","n":""},{"y":"JEDI.MI","c":"Tematici","t":"JEDI","n":""},
-{"y":"JRGE.MI","c":"NEW AREA","t":"JRGE","n":""},{"y":"JU13.MI","c":"BOND","t":"JU13","n":""},
-{"y":"KARS.MI","c":"Settoriali","t":"KARS","n":""},{"y":"KOR.MI","c":"Paesi","t":"KOR","n":""},
-{"y":"KRBN.MI","c":"Materie","t":"KRBN","n":""},{"y":"KWBE.MI","c":"Tematici","t":"KWBE","n":""},
-{"y":"LABL.MI","c":"Tematici","t":"LABL","n":""},{"y":"LAFRI.MI","c":"NEW AREA","t":"LAFRI","n":""},
-{"y":"LCCN.MI","c":"Paesi","t":"LCCN","n":""},{"y":"LEAD.MI","c":"Materie","t":"LEAD","n":""},
-{"y":"LGUS.MI","c":"Paesi","t":"LGUS","n":""},{"y":"LINXB.MI","c":"ATTIVO","t":"LINXB","n":""},
-{"y":"LITM.MI","c":"Tematici","t":"LITM","n":""},{"y":"LITU.MI","c":"Tematici","t":"LITU","n":""},
-{"y":"LOCK.MI","c":"Tematici","t":"LOCK","n":""},{"y":"LTAM.MI","c":"NEW AREA","t":"LTAM","n":""},
-{"y":"LVO.MI","c":"Materie","t":"LVO","n":""},{"y":"MACV.MI","c":"ATTIVO","t":"MACV","n":""},
-{"y":"MAGR.MI","c":"ATTIVO","t":"MAGR","n":""},{"y":"MATW.MI","c":"Settoriali","t":"MATW","n":""},
-{"y":"MCHN.MI","c":"Paesi","t":"MCHN","n":""},{"y":"MCHT.MI","c":"Tematici","t":"MCHT","n":""},
-{"y":"META.MI","c":"Materie","t":"META","n":""},{"y":"METAA.MI","c":"Tematici","t":"METAA","n":""},
-{"y":"METAJ.MI","c":"Tematici","t":"METAJ","n":""},{"y":"METE.MI","c":"Tematici","t":"METE","n":""},
-{"y":"METL.MI","c":"Tematici","t":"METL","n":""},{"y":"MILL.MI","c":"Tematici","t":"MILL","n":""},
-{"y":"MLPS.MI","c":"Tematici","t":"MLPS","n":""},{"y":"MODR.MI","c":"ATTIVO","t":"MODR","n":""},
-{"y":"MTAV.MI","c":"Tematici","t":"MTAV","n":""},{"y":"MTVS.MI","c":"Tematici","t":"MTVS","n":""},
-{"y":"NATO.MI","c":"Settoriali","t":"NATO","n":""},{"y":"NCLR.MI","c":"Tematici","t":"NCLR","n":""},
-{"y":"NGAS.MI","c":"Materie","t":"NGAS","n":""},{"y":"NICK.MI","c":"Materie","t":"NICK","n":""},
-{"y":"NRJC.MI","c":"Tematici","t":"NRJC","n":""},{"y":"NTSG.MI","c":"ATTIVO","t":"NTSG","n":""},
-{"y":"NUCL.MI","c":"Tematici","t":"NUCL","n":""},{"y":"OCEAN.MI","c":"Settoriali","t":"OCEAN","n":""},
-{"y":"OIH.MI","c":"Tematici","t":"OIH","n":""},{"y":"OVER.MI","c":"BOND","t":"OVER","n":""},
-{"y":"PAVE.MI","c":"Tematici","t":"PAVE","n":""},{"y":"PCOM.MI","c":"Materie","t":"PCOM","n":""},
-{"y":"PHAG.MI","c":"Materie","t":"PHAG","n":""},{"y":"PHPD.MI","c":"Materie","t":"PHPD","n":""},
-{"y":"PHPM.MI","c":"Materie","t":"PHPM","n":""},{"y":"PHPT.MI","c":"Materie","t":"PHPT","n":""},
-{"y":"PJSR.MI","c":"BOND","t":"PJSR","n":""},{"y":"QNTM.MI","c":"Tematici","t":"QNTM","n":""},
-{"y":"QTOP.MI","c":"Paesi","t":"QTOP","n":""},{"y":"QUAD.MI","c":"Tematici","t":"QUAD","n":""},
-{"y":"RARE.MI","c":"Tematici","t":"RARE","n":""},{"y":"RAYZ.MI","c":"Tematici","t":"RAYZ","n":""},
-{"y":"RBOT.MI","c":"ADVICE","t":"RBOT","n":""},{"y":"REMX.MI","c":"Tematici","t":"REMX","n":""},
-{"y":"RENW.MI","c":"Tematici","t":"RENW","n":""},{"y":"REUS.MI","c":"Tematici","t":"REUS","n":""},
-{"y":"REUSE.MI","c":"Settoriali","t":"REUSE","n":""},{"y":"RNRG.MI","c":"Tematici","t":"RNRG","n":""},
-{"y":"ROBO.MI","c":"Tematici","t":"ROBO","n":""},{"y":"ROE.MI","c":"Tematici","t":"ROE","n":""},
-{"y":"SAUDI.MI","c":"Paesi","t":"SAUDI","n":""},{"y":"SAUS.MI","c":"Paesi","t":"SAUS","n":""},
-{"y":"SBIO.MI","c":"Settoriali","t":"SBIO","n":""},{"y":"SCITY.MI","c":"Tematici","t":"SCITY","n":""},
-{"y":"SDG9.MI","c":"Tematici","t":"SDG9","n":""},{"y":"SEMA.MI","c":"NEW AREA","t":"SEMA","n":""},
-{"y":"SEME.MI","c":"Tematici","t":"SEME","n":""},{"y":"SGBS.MI","c":"Materie","t":"SGBS","n":""},
-{"y":"SHEME.MI","c":"BOND","t":"SHEME","n":""},{"y":"SILV.MI","c":"Tematici","t":"SILV","n":""},
-{"y":"SJPA.MI","c":"NEW AREA","t":"SJPA","n":""},{"y":"SMCX.MI","c":"ADVICE","t":"SMCX","n":""},
-{"y":"SMEA.MI","c":"ADVICE","t":"SMEA","n":""},{"y":"SMH.MI","c":"Tematici","t":"SMH","n":""},
-{"y":"SNSR.MI","c":"Tematici","t":"SNSR","n":""},{"y":"SOLR.MI","c":"Tematici","t":"SOLR","n":""},
-{"y":"SOYB.MI","c":"Materie","t":"SOYB","n":""},{"y":"SOYO.MI","c":"Materie","t":"SOYO","n":""},
-{"y":"SP1E.MI","c":"Paesi","t":"SP1E","n":""},{"y":"SP5A.MI","c":"ADVICE","t":"SP5A","n":""},
-{"y":"SPXE.MI","c":"Paesi","t":"SPXE","n":""},{"y":"SPXJ.MI","c":"Paesi","t":"SPXJ","n":""},
-{"y":"SPY5.MI","c":"Paesi","t":"SPY5","n":""},{"y":"SRIUC.MI","c":"BOND","t":"SRIUC","n":""},
-{"y":"SRSA.MI","c":"Paesi","t":"SRSA","n":""},{"y":"STAW.MI","c":"Settoriali","t":"STAW","n":""},
-{"y":"DFSV.DE","c":"SPDR EURO","t":"DFSV","n":""},{"y":"STKX.MI","c":"SPDR EURO","t":"STKX","n":""},
-{"y":"STNX.MI","c":"SPDR EURO","t":"STNX","n":""},{"y":"STPX.MI","c":"SPDR EURO","t":"STPX","n":""},
-{"y":"STQX.MI","c":"SPDR EURO","t":"STQX","n":""},{"y":"STRX.MI","c":"SPDR EURO","t":"STRX","n":""},
-{"y":"STSX.MI","c":"SPDR EURO","t":"STSX","n":""},{"y":"STTX.MI","c":"SPDR EURO","t":"STTX","n":""},
-{"y":"STUX.MI","c":"SPDR EURO","t":"STUX","n":""},{"y":"SUGA.MI","c":"Materie","t":"SUGA","n":""},
-{"y":"SW2CHB.MI","c":"Paesi","t":"SW2CHB","n":""},{"y":"SWDA.MI","c":"ADVICE","t":"SWDA","n":""},
-{"y":"SXLB.MI","c":"SPDR USA","t":"SXLB","n":""},{"y":"SXLC.MI","c":"SPDR USA","t":"SXLC","n":""},
-{"y":"SXLF.MI","c":"SPDR USA","t":"SXLF","n":""},{"y":"SXLI.MI","c":"SPDR USA","t":"SXLI","n":""},
-{"y":"SXLK.MI","c":"SPDR USA","t":"SXLK","n":""},{"y":"SXLP.MI","c":"SPDR USA","t":"SXLP","n":""},
-{"y":"SXLU.MI","c":"SPDR USA","t":"SXLU","n":""},{"y":"SXLV.MI","c":"SPDR USA","t":"SXLV","n":""},
-{"y":"SXLY.MI","c":"SPDR USA","t":"SXLY","n":""},{"y":"T10A.MI","c":"BOND","t":"T10A","n":""},
-{"y":"TELE.MI","c":"Settoriali","t":"TELE","n":""},{"y":"TELEW.MI","c":"Settoriali","t":"TELEW","n":""},
-{"y":"TIP1A.MI","c":"BOND","t":"TIP1A","n":""},{"y":"TLCO.MI","c":"Tematici","t":"TLCO","n":""},
-{"y":"TNO.MI","c":"Settoriali","t":"TNO","n":""},{"y":"TNOW.MI","c":"Settoriali","t":"TNOW","n":""},
-{"y":"TRVL.MI","c":"Settoriali","t":"TRVL","n":""},{"y":"TTFW.MI","c":"Materie","t":"TTFW","n":""},
-{"y":"TUR.MI","c":"Paesi","t":"TUR","n":""},{"y":"U3O8.MI","c":"Tematici","t":"U3O8","n":""},
-{"y":"UCRP.MI","c":"BOND","t":"UCRP","n":""},{"y":"UGAS.MI","c":"Materie","t":"UGAS","n":""},
-{"y":"UKE.MI","c":"Paesi","t":"UKE","n":""},{"y":"UNIC.MI","c":"Tematici","t":"UNIC","n":""},
-{"y":"URNJ.MI","c":"Tematici","t":"URNJ","n":""},{"y":"URNU.MI","c":"ADVICE","t":"URNU","n":""},
-{"y":"US1.MI","c":"BOND","t":"US1","n":""},{"y":"US10C.MI","c":"BOND","t":"US10C","n":""},
-{"y":"US7.MI","c":"BOND","t":"US7","n":""},{"y":"USCBC.MI","c":"BOND","t":"USCBC","n":""},
-{"y":"USIC.MI","c":"BOND","t":"USIC","n":""},{"y":"USIG.MI","c":"BOND","t":"USIG","n":""},
-{"y":"USTEC.MI","c":"Tematici","t":"USTEC","n":""},{"y":"UTI.MI","c":"Settoriali","t":"UTI","n":""},
-{"y":"UTIW.MI","c":"Settoriali","t":"UTIW","n":""},{"y":"VAGF.MI","c":"BOND","t":"VAGF","n":""},
-{"y":"VCDE.MI","c":"BOND","t":"VCDE","n":""},{"y":"VDCA.MI","c":"BOND","t":"VDCA","n":""},
-{"y":"VDCE.MI","c":"BOND","t":"VDCE","n":""},{"y":"VDEA.MI","c":"BOND","t":"VDEA","n":""},
-{"y":"VDST.MI","c":"BOND","t":"VDST","n":""},{"y":"VECA.MI","c":"BOND","t":"VECA","n":""},
-{"y":"VEGI.MI","c":"Tematici","t":"VEGI","n":""},{"y":"VGEA.MI","c":"BOND","t":"VGEA","n":""},
-{"y":"VITA.MI","c":"Settoriali","t":"VITA","n":""},{"y":"VITU.MI","c":"Settoriali","t":"VITU","n":""},
-{"y":"VJPE.MI","c":"Paesi","t":"VJPE","n":""},{"y":"VNGA20.MI","c":"ATTIVO","t":"VNGA20","n":""},
-{"y":"VNGA40.MI","c":"ATTIVO","t":"VNGA40","n":""},{"y":"VNGA60.MI","c":"ATTIVO","t":"VNGA60","n":""},
-{"y":"VNGA80.MI","c":"ATTIVO","t":"VNGA80","n":""},{"y":"VOLT.MI","c":"Tematici","t":"VOLT","n":""},
-{"y":"VPN.MI","c":"Tematici","t":"VPN","n":""},{"y":"VSCF.MI","c":"BOND","t":"VSCF","n":""},
-{"y":"VSGF.MI","c":"BOND","t":"VSGF","n":""},{"y":"VUCE.MI","c":"BOND","t":"VUCE","n":""},
-{"y":"VUKE.MI","c":"Paesi","t":"VUKE","n":""},{"y":"VUSA.MI","c":"Paesi","t":"VUSA","n":""},
-{"y":"WATC.MI","c":"Tematici","t":"WATC","n":""},{"y":"WATT.MI","c":"Materie","t":"WATT","n":""},
-{"y":"WBLK.MI","c":"Tematici","t":"WBLK","n":""},{"y":"WCBR.MI","c":"Tematici","t":"WCBR","n":""},
-{"y":"WCCA.MI","c":"Materie","t":"WCCA","n":""},{"y":"WCLD.MI","c":"Settoriali","t":"WCLD","n":""},
-{"y":"WCOA.MI","c":"Materie","t":"WCOA","n":""},{"y":"WCOD.MI","c":"SPDR WORLD","t":"WCOD","n":""},
-{"y":"WCOE.MI","c":"Materie","t":"WCOE","n":""},{"y":"WCOS.MI","c":"SPDR WORLD","t":"WCOS","n":""},
-{"y":"WDEF.MI","c":"Tematici","t":"WDEF","n":""},{"y":"WDNA.MI","c":"Tematici","t":"WDNA","n":""},
-{"y":"WEAT.MI","c":"Materie","t":"WEAT","n":""},{"y":"WEB3.MI","c":"Tematici","t":"WEB3","n":""},
-{"y":"WENT.MI","c":"Materie","t":"WENT","n":""},{"y":"WENU.MI","c":"Materie","t":"WENU","n":""},
-{"y":"WFIN.MI","c":"SPDR WORLD","t":"WFIN","n":""},{"y":"WGRO.MI","c":"Tematici","t":"WGRO","n":""},
-{"y":"WHEA.MI","c":"SPDR WORLD","t":"WHEA","n":""},{"y":"WIND.MI","c":"SPDR WORLD","t":"WIND","n":""},
-{"y":"WMAT.MI","c":"SPDR WORLD","t":"WMAT","n":""},{"y":"WMGT.MI","c":"Tematici","t":"WMGT","n":""},
-{"y":"WMIB.MI","c":"Paesi","t":"WMIB","n":""},{"y":"WNAS.MI","c":"Paesi","t":"WNAS","n":""},
-{"y":"WNDE.MI","c":"Tematici","t":"WNDE","n":""},{"y":"WNDY.MI","c":"Tematici","t":"WNDY","n":""},
-{"y":"WNRG.MI","c":"SPDR WORLD","t":"WNRG","n":""},{"y":"WRNW.MI","c":"Tematici","t":"WRNW","n":""},
-{"y":"WRTY.MI","c":"Paesi","t":"WRTY","n":""},{"y":"WS5X.MI","c":"Paesi","t":"WS5X","n":""},
-{"y":"WSLV.MI","c":"Tematici","t":"WSLV","n":""},{"y":"WSPE.MI","c":"Paesi","t":"WSPE","n":""},
-{"y":"WSPX.MI","c":"Paesi","t":"WSPX","n":""},{"y":"WTAI.MI","c":"Tematici","t":"WTAI","n":""},
-{"y":"WTEC.MI","c":"SPDR WORLD","t":"WTEC","n":""},{"y":"WTEL.MI","c":"SPDR WORLD","t":"WTEL","n":""},
-{"y":"WTI.MI","c":"Materie","t":"WTI","n":""},{"y":"WTID.MI","c":"Materie","t":"WTID","n":""},
-{"y":"WTRE.MI","c":"Tematici","t":"WTRE","n":""},{"y":"WUTI.MI","c":"SPDR WORLD","t":"WUTI","n":""},
-{"y":"X25E.MI","c":"BOND","t":"X25E","n":""},{"y":"X7PS.MI","c":"Settoriali","t":"X7PS","n":""},
-{"y":"XAGZ.MI","c":"Materie","t":"XAGZ","n":""},{"y":"XAIX.MI","c":"ADVICE","t":"XAIX","n":""},
-{"y":"XBAE.MI","c":"BOND","t":"XBAE","n":""},{"y":"XBAG.MI","c":"BOND","t":"XBAG","n":""},
-{"y":"XBLC.MI","c":"BOND","t":"XBLC","n":""},{"y":"XBNK.MI","c":"BOND","t":"XBNK","n":""},
-{"y":"XCHA.MI","c":"Paesi","t":"XCHA","n":""},{"y":"XCS5.MI","c":"Paesi","t":"XCS5","n":""},
-{"y":"XCTE.MI","c":"Tematici","t":"XCTE","n":""},{"y":"XDAX.MI","c":"Paesi","t":"XDAX","n":""},
-{"y":"XDBC.MI","c":"Materie","t":"XDBC","n":""},{"y":"XDEE.MI","c":"NEW AREA","t":"XDEE","n":""},
-{"y":"XDER.MI","c":"Tematici","t":"XDER","n":""},{"y":"XDEV.MI","c":"ADVICE","t":"XDEV","n":""},
-{"y":"XDG3.MI","c":"Tematici","t":"XDG3","n":""},{"y":"XDG6.MI","c":"Tematici","t":"XDG6","n":""},
-{"y":"XDG7.MI","c":"Tematici","t":"XDG7","n":""},{"y":"XDGI.MI","c":"Tematici","t":"XDGI","n":""},
-{"y":"XDRE.MI","c":"Settoriali","t":"XDRE","n":""},{"y":"XDW0.MI","c":"Settoriali","t":"XDW0","n":""},
-{"y":"XDWC.MI","c":"Settoriali","t":"XDWC","n":""},{"y":"XDWF.MI","c":"Settoriali","t":"XDWF","n":""},
-{"y":"XDWH.MI","c":"Settoriali","t":"XDWH","n":""},{"y":"XDWI.MI","c":"Settoriali","t":"XDWI","n":""},
-{"y":"XDWM.MI","c":"Settoriali","t":"XDWM","n":""},{"y":"XDWS.MI","c":"Settoriali","t":"XDWS","n":""},
-{"y":"XDWT.MI","c":"Settoriali","t":"XDWT","n":""},{"y":"XDWU.MI","c":"Settoriali","t":"XDWU","n":""},
-{"y":"XE01.MI","c":"BOND","t":"XE01","n":""},{"y":"XEON.MI","c":"Liquidità","t":"XEON","n":""},
-{"y":"XFNT.MI","c":"Tematici","t":"XFNT","n":""},{"y":"XFVT.MI","c":"Paesi","t":"XFVT","n":""},
-{"y":"XG11.MI","c":"Tematici","t":"XG11","n":""},{"y":"XG12.MI","c":"Tematici","t":"XG12","n":""},
-{"y":"XGEN.MI","c":"Tematici","t":"XGEN","n":""},{"y":"XGLE.MI","c":"BOND","t":"XGLE","n":""},
-{"y":"XIFE.MI","c":"Settoriali","t":"XIFE","n":""},{"y":"XLBS.MI","c":"Settoriali","t":"XLBS","n":""},
-{"y":"XLCS.MI","c":"Settoriali","t":"XLCS","n":""},{"y":"XLES.MI","c":"Settoriali","t":"XLES","n":""},
-{"y":"XLFS.MI","c":"Settoriali","t":"XLFS","n":""},{"y":"XLIS.MI","c":"Settoriali","t":"XLIS","n":""},
-{"y":"XLKS.MI","c":"Settoriali","t":"XLKS","n":""},{"y":"XLPE.MI","c":"Tematici","t":"XLPE","n":""},
-{"y":"XLPS.MI","c":"Settoriali","t":"XLPS","n":""},{"y":"XLUS.MI","c":"Settoriali","t":"XLUS","n":""},
-{"y":"XLVS.MI","c":"Settoriali","t":"XLVS","n":""},{"y":"XLYS.MI","c":"Settoriali","t":"XLYS","n":""},
-{"y":"D5BI.DE","c":"Paesi","t":"D5BI","n":""},{"y":"XMME.MI","c":"ADVICE","t":"XMME","n":""},
-{"y":"XMOV.MI","c":"Tematici","t":"XMOV","n":""},{"y":"XNGI.MI","c":"Tematici","t":"XNGI","n":""},
-{"y":"XNNV.MI","c":"Tematici","t":"XNNV","n":""},{"y":"XQUI.MI","c":"ATTIVO","t":"XQUI","n":""},
-{"y":"XRES.MI","c":"Tematici","t":"XRES","n":""},{"y":"XS8R.MI","c":"Tematici","t":"XS8R","n":""},
-{"y":"XSFR.MI","c":"Paesi","t":"XSFR","n":""},{"y":"XSGI.MI","c":"Tematici","t":"XSGI","n":""},
-{"y":"XSMI.MI","c":"Paesi","t":"XSMI","n":""},{"y":"XSX6.MI","c":"ADVICE","t":"XSX6","n":""},
-{"y":"XT01.MI","c":"BOND","t":"XT01","n":""},{"y":"XTC5.MI","c":"BOND","t":"XTC5","n":""},
-{"y":"XTIP.MI","c":"BOND","t":"XTIP","n":""},{"y":"XUSA.MI","c":"ATTIVO","t":"XUSA","n":""},
-{"y":"XUTC.MI","c":"Settoriali","t":"XUTC","n":""},{"y":"XWTS.MI","c":"Settoriali","t":"XWTS","n":""},
-{"y":"XXSC.MI","c":"ATTIVO","t":"XXSC","n":""},{"y":"XYP0.MI","c":"BOND","t":"XYP0","n":""},
-{"y":"ZINC.MI","c":"Materie","t":"ZINC","n":""},{"y":"EIDO","c":"Paesi","t":"EIDO","n":""},
-{"y":"EIRL","c":"Paesi","t":"EIRL","n":""},{"y":"IMOM","c":"ATTIVO","t":"IMOM","n":""},
-{"y":"DBMFE.PA","c":"ATTIVO","t":"DBMFE","n":""},{"y":"MEUD.PA","c":"NEW AREA","t":"MEUD","n":""},
-{"y":"WRD.PA","c":"Paesi","t":"WRD","n":""},{"y":"IB01.SW","c":"BOND","t":"IB01","n":""},
-{"y":"SDGPEX.SW","c":"ATTIVO","t":"SDGPEX","n":""},{"y":"VSCF.MI","c":"Liquidità","t":"VSCF_L","n":""},
-{"y":"X13E.MI","c":"Liquidità","t":"X13E","n":""},{"y":"EM13.MI","c":"Liquidità","t":"EM13","n":""},
-{"y":"ERNE.MI","c":"Liquidità","t":"ERNE","n":""},{"y":"INFR.MI","c":"Tematici","t":"INFR","n":""},
-{"y":"swda.MI","c":"benchmark","t":"SWDA","n":""},{"y":"xdwd.MI","c":"benchmark","t":"XDWD","n":""},
-{"y":"cw8.MI","c":"benchmark","t":"CW8","n":""},{"y":"imeu.MI","c":"benchmark","t":"IMEU","n":""},
-{"y":"inaa.MI","c":"benchmark","t":"INAA","n":""},{"y":"CSPXJ.MI","c":"benchmark","t":"CSPXJ_B","n":""},
-{"y":"sema.MI","c":"benchmark","t":"SEMA_B","n":""},{"y":"xmme.MI","c":"benchmark","t":"XMME_B","n":""},
-{"y":"iwmo.MI","c":"benchmark","t":"IWMO_B","n":""},{"y":"xdem.MI","c":"benchmark","t":"XDEM_B","n":""},
-{"y":"SXLE.MI","c":"SPDR USA","t":"SXLE","n":""},{"y":"MGIN.MI","c":"SPDR USA","t":"MGIN","n":""},
-{"y":"STWX.MI","c":"SPDR EURO","t":"STWX","n":""},{"y":"STZX.MI","c":"SPDR EURO","t":"STZX","n":""},
-{"y":"SWRD.MI","c":"benchmark","t":"SWRD","n":""},{"y":"600X.MI","c":"benchmark","t":"600X","n":""},
-{"y":"EIS","c":"Paesi","t":"EIS","n":""},{"y":"ENZL","c":"Paesi","t":"ENZL","n":""},
-{"y":"EPHE","c":"Paesi","t":"EPHE","n":""},{"y":"EPI","c":"Paesi","t":"EPI","n":""},
-{"y":"EPOL","c":"Paesi","t":"EPOL","n":""},{"y":"EPU","c":"Paesi","t":"EPU","n":""},
-{"y":"EWA","c":"Paesi","t":"EWA","n":""},{"y":"EWC","c":"Paesi","t":"EWC","n":""},
-{"y":"EWD","c":"Paesi","t":"EWD","n":""},{"y":"EWG","c":"Paesi","t":"EWG","n":""},
-{"y":"EWH","c":"Paesi","t":"EWH","n":""},{"y":"EWI","c":"Paesi","t":"EWI","n":""},
-{"y":"EWJ","c":"Paesi","t":"EWJ","n":""},{"y":"EWK","c":"Paesi","t":"EWK","n":""},
-{"y":"EWL","c":"Paesi","t":"EWL","n":""},{"y":"EWM","c":"Paesi","t":"EWM","n":""},
-{"y":"EWN","c":"Paesi","t":"EWN","n":""},{"y":"EWO","c":"Paesi","t":"EWO","n":""},
-{"y":"EWP","c":"Paesi","t":"EWP","n":""},{"y":"EWQ","c":"Paesi","t":"EWQ","n":""},
-{"y":"EWS","c":"Paesi","t":"EWS","n":""},{"y":"EWT","c":"Paesi","t":"EWT","n":""},
-{"y":"EWU","c":"Paesi","t":"EWU","n":""},{"y":"EWW","c":"Paesi","t":"EWW","n":""},
-{"y":"EWY","c":"Paesi","t":"EWY","n":""},{"y":"EWZ","c":"Paesi","t":"EWZ","n":""},
-{"y":"EZA","c":"Paesi","t":"EZA","n":""},{"y":"FM.TO","c":"Paesi","t":"FM","n":""},
-{"y":"GREK","c":"Paesi","t":"GREK","n":""},{"y":"GXG","c":"Paesi","t":"GXG","n":""},
-{"y":"ICLN","c":"Tematici","t":"ICLN","n":""},{"y":"ILF","c":"Paesi","t":"ILF","n":""},
-{"y":"MES","c":"Paesi","t":"MES","n":""},{"y":"NORW","c":"Paesi","t":"NORW","n":""},
-{"y":"QQQ","c":"Paesi","t":"QQQ","n":""},{"y":"SPLV","c":"Paesi","t":"SPLV","n":""},
-{"y":"SPY","c":"Paesi","t":"SPY","n":""},{"y":"THD","c":"Paesi","t":"THD","n":""},
-{"y":"UAE","c":"Paesi","t":"UAE","n":""},{"y":"VNM","c":"Paesi","t":"VNM","n":""},
-{"y":"VPL","c":"Paesi","t":"VPL","n":""},
-{"y":"ADS.DE","c":"EUROGROW","t":"ADS","n":""},{"y":"ADYEN.AS","c":"EUROGROW","t":"ADYEN","n":""},
-{"y":"AI.PA","c":"EUROGROW","t":"AI","n":""},{"y":"AIR.PA","c":"EUROGROW","t":"AIR","n":""},
-{"y":"AM.PA","c":"EUROGROW","t":"AM","n":""},{"y":"AMS.WA","c":"EUROGROW","t":"AMS","n":""},
-{"y":"ARGX","c":"EUROGROW","t":"ARGX","n":""},{"y":"ASM.SW","c":"EUROGROW","t":"ASM","n":""},
-{"y":"ASML.SW","c":"EUROGROW","t":"ASML","n":""},{"y":"BEI.DE","c":"EUROGROW","t":"BEI","n":""},
-{"y":"CBK.DE","c":"EUROGROW","t":"CBK","n":""},{"y":"DB1.DE","c":"EUROGROW","t":"DB1","n":""},
-{"y":"DIM.PA","c":"EUROGROW","t":"DIM","n":""},{"y":"DSY.PA","c":"EUROGROW","t":"DSY","n":""},
-{"y":"DTE.DE","c":"EUROGROW","t":"DTE","n":""},{"y":"EL.PA","c":"EUROGROW","t":"EL","n":""},
-{"y":"ELE.MC","c":"EUROGROW","t":"ELE","n":""},{"y":"ENR.DE","c":"EUROGROW","t":"ENR","n":""},
-{"y":"FER.MC","c":"EUROGROW","t":"FER","n":""},{"y":"HEI.DE","c":"EUROGROW","t":"HEI","n":""},
-{"y":"HO.PA","c":"EUROGROW","t":"HO","n":""},{"y":"IFX.DE","c":"EUROGROW","t":"IFX","n":""},
-{"y":"ITX.VI","c":"EUROGROW","t":"ITX","n":""},{"y":"KNEBV.HE","c":"EUROGROW","t":"KNEBV","n":""},
-{"y":"LDO.MI","c":"EUROGROW","t":"LDO","n":""},{"y":"LR.PA","c":"EUROGROW","t":"LR","n":""},
-{"y":"MC.PA","c":"EUROGROW","t":"MC","n":""},{"y":"NOKIA.HE","c":"EUROGROW","t":"NOKIA","n":""},
-{"y":"OR.PA","c":"EUROGROW","t":"OR","n":""},{"y":"PRX.AS","c":"EUROGROW","t":"PRX","n":""},
-{"y":"PRY.MI","c":"EUROGROW","t":"PRY","n":""},{"y":"RACE.MI","c":"EUROGROW","t":"RACE","n":""},
-{"y":"RHM.DE","c":"EUROGROW","t":"RHM","n":""},{"y":"RMS.PA","c":"EUROGROW","t":"RMS","n":""},
-{"y":"RYA.IR","c":"EUROGROW","t":"RYA","n":""},{"y":"SAF.PA","c":"EUROGROW","t":"SAF","n":""},
-{"y":"SAP.DE","c":"EUROGROW","t":"SAP","n":""},{"y":"SHL.DE","c":"EUROGROW","t":"SHL","n":""},
-{"y":"SIE.DE","c":"EUROGROW","t":"SIE","n":""},{"y":"SRT.DE","c":"EUROGROW","t":"SRT","n":""},
-{"y":"STMMI.PA","c":"EUROGROW","t":"STMMI","n":""},{"y":"SU.PA","c":"EUROGROW","t":"SU","n":""},
-{"y":"UCB","c":"EUROGROW","t":"UCB","n":""},{"y":"UCG.MI","c":"EUROGROW","t":"UCG","n":""},
-{"y":"UMG.AS","c":"EUROGROW","t":"UMG","n":""},{"y":"WKL.VI","c":"EUROGROW","t":"WKL","n":""}
-];
-
-// STOOQ list is the EU subset (tickers with exchange suffix .MI .DE .PA .AS etc, excluding USA-only)
-const TICKERS_STOOQ = TICKERS_YAHOO.filter(t=>{
-  const y=t.y;
-  return y.includes('.MI')||y.includes('.DE')||y.includes('.PA')||y.includes('.AS')||
-    y.includes('.F')||y.includes('.L')||y.includes('.SW')||y.includes('.WA')||
-    y.includes('.IR')||y.includes('.VI')||y.includes('.MC')||y.includes('.HE');
-});
-
-let TICKERS = TICKERS_YAHOO;
-
-// ═══════════════════════════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════════════════════════
-let allResults=[], filteredResults=[];
-let activeSig='ALL', activeCombo=null, activeCat='ALL';
-let sortField='score', sortDir=-1;
-let smartOn=false, smartTimer=null, smartCountdown=null;
+// ═══ CONFIG ═══
+const JSON_URL='https://raw.githubusercontent.com/Giorgiogoldoni/raptor-one/main/raptor_data.json';
+const CHART_JSON='https://raw.githubusercontent.com/Giorgiogoldoni/raptor-one/main/raptor_chart.json';
+const MAX_AGE_HOURS=2;
 const BATCH=20, DELAY=350;
 
-// ═══════════════════════════════════════════════════════════════════
-//  CARICA JSON DA GITHUB (fonte primaria — nessun proxy, nessun CORS)
-// ═══════════════════════════════════════════════════════════════════
-const JSON_URL='https://raw.githubusercontent.com/Giorgiogoldoni/fixed/main/raptor_data.json';
-const MAX_AGE_HOURS=2; // dopo quanto tempo il JSON è considerato "vecchio"
+// ═══ STATE ═══
+let allResults=[],filteredResults=[];
+let activeSig='ALL',activeCombo=null,activeCat='ALL';
+let sortField='score',sortDir=-1;
+let smartOn=false,smartTimer=null,smartCountdown=null;
+let chartInstances={},currentTF='1m',currentSym='',currentSrc='yahoo';
+let chartJsonCache=null;
 
+// ═══ TICKER LIST ═══
+const TICKERS_YAHOO=[
+{"y":"IAEX.AS","c":"Paesi","t":"IAEX"},{"y":"TOF.AS","c":"ATTIVO","t":"TOF"},{"y":"18MN.DE","c":"Lazy","t":"18MN"},{"y":"7USH.DE","c":"BOND","t":"7USH"},{"y":"CBUH.DE","c":"ATTIVO","t":"CBUH"},{"y":"CEB1.DE","c":"BOND","t":"CEB1"},{"y":"CEB4.DE","c":"NEW AREA","t":"CEB4"},{"y":"GXDW","c":"Paesi","t":"GXDW"},{"y":"DBZB.DE","c":"Lazy","t":"DBZB"},{"y":"EUNY.DE","c":"ATTIVO","t":"EUNY"},{"y":"FTGM.DE","c":"ATTIVO","t":"FTGM"},{"y":"IBC5.DE","c":"BOND","t":"IBC5"},{"y":"IBCJ.DE","c":"Paesi","t":"IBCJ"},{"y":"IQQ9.DE","c":"NEW AREA","t":"IQQ9"},{"y":"IQQF.DE","c":"NEW AREA","t":"IQQF"},{"y":"IS04.DE","c":"BOND","t":"IS04"},{"y":"IS3C.DE","c":"Lazy","t":"IS3C"},{"y":"IS3N.DE","c":"Lazy","t":"IS3N"},{"y":"IS3U.DE","c":"Paesi","t":"IS3U"},{"y":"ISPA.DE","c":"ATTIVO","t":"ISPA"},{"y":"IUSQ.DE","c":"Lazy","t":"IUSQ"},{"y":"IUSS.DE","c":"Paesi","t":"IUSS"},{"y":"LCUJ.DE","c":"Lazy","t":"LCUJ"},{"y":"MJMT.DE","c":"ATTIVO","t":"MJMT"},{"y":"QDVA.DE","c":"ATTIVO","t":"QDVA"},{"y":"SPP5.DE","c":"BOND","t":"SPP5"},{"y":"SPYX.DE","c":"ATTIVO","t":"SPYX"},{"y":"SXR1.DE","c":"Lazy","t":"SXR1"},{"y":"SXRT.DE","c":"Lazy","t":"SXRT"},{"y":"SXRU.DE","c":"NEW AREA","t":"SXRU"},{"y":"SXRW.DE","c":"Lazy","t":"SXRW"},{"y":"VGWE.DE","c":"ATTIVO","t":"VGWE"},{"y":"VUKG.DE","c":"Paesi","t":"VUKG"},{"y":"XBAS.DE","c":"Paesi","t":"XBAS"},{"y":"XCS3.DE","c":"Paesi","t":"XCS3"},{"y":"XCS4.DE","c":"Paesi","t":"XCS4"},{"y":"XD9E.DE","c":"Lazy","t":"XD9E"},{"y":"XD9U.DE","c":"Lazy","t":"XD9U"},{"y":"XDEM.DE","c":"ATTIVO","t":"XDEM"},{"y":"XESD.DE","c":"Paesi","t":"XESD"},{"y":"XGIN.DE","c":"Lazy","t":"XGIN"},{"y":"XMKA.DE","c":"Paesi","t":"XMKA"},{"y":"XPQP.DE","c":"Paesi","t":"XPQP"},{"y":"XWEM.DE","c":"ATTIVO","t":"XWEM"},{"y":"F701.F","c":"ATTIVO","t":"F701"},{"y":"F702.F","c":"ATTIVO","t":"F702"},{"y":"F703.F","c":"ATTIVO","t":"F703"},{"y":"IUSN.F","c":"ADVICE","t":"IUSN"},{"y":"IVAI.MI","c":"Tematici","t":"IVAI"},{"y":"IVDF.DE","c":"Tematici","t":"IVDF"},{"y":"NQSE.F","c":"NEW AREA","t":"NQSE"},{"y":"NTSZ.DE","c":"ATTIVO","t":"NTSZ"},{"y":"IEFM.L","c":"ATTIVO","t":"IEFM"},{"y":"A01U.MI","c":"BOND","t":"A01U"},{"y":"ACT20.MI","c":"ATTIVO","t":"ACT20"},{"y":"ACT60.MI","c":"ATTIVO","t":"ACT60"},{"y":"ACTEQ.MI","c":"ATTIVO","t":"ACTEQ"},{"y":"ADLU.MI","c":"BOND","t":"ADLU"},{"y":"AEGE.MI","c":"BOND","t":"AEGE"},{"y":"AGEB.MI","c":"BOND","t":"AGEB"},{"y":"AGED.MI","c":"Tematici","t":"AGED"},{"y":"AGGH.MI","c":"BOND","t":"AGGH"},{"y":"AI4UJ.MI","c":"Tematici","t":"AI4UJ"},{"y":"AIAA.MI","c":"Tematici","t":"AIAA"},{"y":"AIAI.MI","c":"Tematici","t":"AIAI"},{"y":"AICU.MI","c":"BOND","t":"AICU"},{"y":"AIGA.MI","c":"Materie","t":"AIGA"},{"y":"AIGC.MI","c":"Materie","t":"AIGC"},{"y":"AIGE.MI","c":"Materie","t":"AIGE"},{"y":"AIGG.MI","c":"Materie","t":"AIGG"},{"y":"AIGI.MI","c":"Materie","t":"AIGI"},{"y":"AIGL.MI","c":"Materie","t":"AIGL"},{"y":"AIGO.MI","c":"Materie","t":"AIGO"},{"y":"AIGP.MI","c":"Materie","t":"AIGP"},{"y":"AIGS.MI","c":"Materie","t":"AIGS"},{"y":"AINF.MI","c":"Tematici","t":"AINF"},{"y":"AIQE.MI","c":"Tematici","t":"AIQE"},{"y":"ALAT.MI","c":"NEW AREA","t":"ALAT"},{"y":"ALUM.MI","c":"Materie","t":"ALUM"},{"y":"ANAU.MI","c":"ADVICE","t":"ANAU"},{"y":"AQWA.MI","c":"Tematici","t":"AQWA"},{"y":"ARMI.MI","c":"Tematici","t":"ARMI"},{"y":"ARMR.MI","c":"Tematici","t":"ARMR"},{"y":"ASRD.MI","c":"BOND","t":"ASRD"},{"y":"AT1.MI","c":"BOND","t":"AT1"},{"y":"AUCO.MI","c":"Tematici","t":"AUCO"},{"y":"AUHEUA.MI","c":"Paesi","t":"AUHEUA"},{"y":"BATT.MI","c":"Tematici","t":"BATT"},{"y":"BBTR.MI","c":"BOND","t":"BBTR"},{"y":"BCHN.MI","c":"Settoriali","t":"BCHN"},{"y":"BENE.MI","c":"Materie","t":"BENE"},{"y":"BIODV.MI","c":"Settoriali","t":"BIODV"},{"y":"BIOT.MI","c":"Tematici","t":"BIOT"},{"y":"BKCH.MI","c":"Tematici","t":"BKCH"},{"y":"BLTH.MI","c":"Tematici","t":"BLTH"},{"y":"BNK.MI","c":"Settoriali","t":"BNK"},{"y":"BNKE.MI","c":"Settoriali","t":"BNKE"},{"y":"BOTZ.MI","c":"Tematici","t":"BOTZ"},{"y":"BRENT.MI","c":"Materie","t":"BRENT"},{"y":"BRES.MI","c":"Settoriali","t":"BRES"},{"y":"BRIJ.MI","c":"Tematici","t":"BRIJ"},{"y":"BRND.MI","c":"Materie","t":"BRND"},{"y":"BRNT.MI","c":"Materie","t":"BRNT"},{"y":"BSRIC.MI","c":"BOND","t":"BSRIC"},{"y":"BT27.MI","c":"BOND","t":"BT27"},{"y":"BTC.MI","c":"Tematici","t":"BTC"},{"y":"BTECH.MI","c":"Tematici","t":"BTECH"},{"y":"BTECJ.MI","c":"Tematici","t":"BTECJ"},{"y":"BTP10.MI","c":"BOND","t":"BTP10"},{"y":"BUG.MI","c":"Tematici","t":"BUG"},{"y":"C40.MI","c":"Paesi","t":"C40"},{"y":"CAHEUA.MI","c":"NEW AREA","t":"CAHEUA"},{"y":"CARB.MI","c":"Materie","t":"CARB"},{"y":"CAUT.MI","c":"Tematici","t":"CAUT"},{"y":"CBSUSA.MI","c":"BOND","t":"CBSUSA"},{"y":"CCEUAS.MI","c":"Materie","t":"CCEUAS"},{"y":"CCUSAS.MI","c":"Materie","t":"CCUSAS"},{"y":"CHIP.MI","c":"ADVICE","t":"CHIP"},{"y":"CHM.MI","c":"Settoriali","t":"CHM"},{"y":"CIBR.MI","c":"ADVICE","t":"CIBR"},{"y":"CIT.MI","c":"Tematici","t":"CIT"},{"y":"CITE.MI","c":"Tematici","t":"CITE"},{"y":"CITY.MI","c":"Tematici","t":"CITY"},{"y":"CLIP.MI","c":"BOND","t":"CLIP"},{"y":"CLOU.MI","c":"Tematici","t":"CLOU"},{"y":"CMOC.MI","c":"Materie","t":"CMOC"},{"y":"CMOD.MI","c":"Materie","t":"CMOD"},{"y":"CMOE.MI","c":"Materie","t":"CMOE"},{"y":"CN1.MI","c":"Paesi","t":"CN1"},{"y":"CO2.MI","c":"Materie","t":"CO2"},{"y":"COCO.MI","c":"Materie","t":"COCO"},{"y":"COFF.MI","c":"Materie","t":"COFF"},{"y":"COMF.MI","c":"Materie","t":"COMF"},{"y":"COMH.MI","c":"Materie","t":"COMH"},{"y":"COMO.MI","c":"Materie","t":"COMO"},{"y":"COPA.MI","c":"Materie","t":"COPA"},{"y":"COPM.MI","c":"Tematici","t":"COPM"},{"y":"COPR.MI","c":"Tematici","t":"COPR"},{"y":"COPX.MI","c":"Tematici","t":"COPX"},{"y":"CORN.MI","c":"Materie","t":"CORN"},{"y":"COTN.MI","c":"Materie","t":"COTN"},{"y":"CROP.MI","c":"Tematici","t":"CROP"},{"y":"CRRY.MI","c":"Materie","t":"CRRY"},{"y":"CRUD.MI","c":"Materie","t":"CRUD"},{"y":"CSBGE7.MI","c":"BOND","t":"CSBGE7"},{"y":"CSBGU3.MI","c":"BOND","t":"CSBGU3"},{"y":"CSBGU7.MI","c":"BOND","t":"CSBGU7"},{"y":"CSCA.MI","c":"NEW AREA","t":"CSCA"},{"y":"CSEMAS.MI","c":"NEW AREA","t":"CSEMAS"},{"y":"CSMIB.MI","c":"Paesi","t":"CSMIB"},{"y":"CSNDX.MI","c":"Paesi","t":"CSNDX"},{"y":"CSPXJ.MI","c":"NEW AREA","t":"CSPXJ"},{"y":"CSSPX.MI","c":"ADVICE","t":"CSSPX"},{"y":"CSUS.MI","c":"ADVICE","t":"CSUS"},{"y":"CSUSS.MI","c":"ADVICE","t":"CSUSS"},{"y":"CTEK.MI","c":"Tematici","t":"CTEK"},{"y":"CURE.MI","c":"Tematici","t":"CURE"},{"y":"CWE.MI","c":"Settoriali","t":"CWE"},{"y":"CYBO.MI","c":"Tematici","t":"CYBO"},{"y":"CYBR.MI","c":"Settoriali","t":"CYBR"},{"y":"DAPP.MI","c":"Tematici","t":"DAPP"},{"y":"DEFS.MI","c":"Settoriali","t":"DEFS"},{"y":"DEMR.MI","c":"ATTIVO","t":"DEMR"},{"y":"DFND.MI","c":"Tematici","t":"DFND"},{"y":"DFNS.MI","c":"Tematici","t":"DFNS"},{"y":"DGTL.MI","c":"Tematici","t":"DGTL"},{"y":"DISW.MI","c":"Settoriali","t":"DISW"},{"y":"DJE.MI","c":"Paesi","t":"DJE"},{"y":"DMAT.MI","c":"Tematici","t":"DMAT"},{"y":"DOCT.MI","c":"Tematici","t":"DOCT"},{"y":"DPAY.MI","c":"Tematici","t":"DPAY"},{"y":"DRVE.MI","c":"Tematici","t":"DRVE"},{"y":"DXJF.MI","c":"ATTIVO","t":"DXJF"},{"y":"EALU.MI","c":"Materie","t":"EALU"},{"y":"EBIZ.MI","c":"Tematici","t":"EBIZ"},{"y":"EBRT.MI","c":"Materie","t":"EBRT"},{"y":"EBUY.MI","c":"Tematici","t":"EBUY"},{"y":"ECAR.MI","c":"Tematici","t":"ECAR"},{"y":"ECEH.MI","c":"Materie","t":"ECEH"},{"y":"ECO.MI","c":"BOND","t":"ECO"},{"y":"ECOF.MI","c":"Materie","t":"ECOF"},{"y":"ECOM.MI","c":"Tematici","t":"ECOM"},{"y":"ECOP.MI","c":"Materie","t":"ECOP"},{"y":"ECR1.MI","c":"BOND","t":"ECR1"},{"y":"ECRD.MI","c":"Materie","t":"ECRD"},{"y":"ECRN.MI","c":"Materie","t":"ECRN"},{"y":"ECRP3.MI","c":"BOND","t":"ECRP3"},{"y":"ECTN.MI","c":"Materie","t":"ECTN"},{"y":"EDOC.MI","c":"Tematici","t":"EDOC"},{"y":"EEA.MI","c":"Tematici","t":"EEA"},{"y":"EEIA.MI","c":"ATTIVO","t":"EEIA"},{"y":"EENG.MI","c":"Settoriali","t":"EENG"},{"y":"EFCM.MI","c":"Materie","t":"EFCM"},{"y":"EGEHE.MI","c":"Settoriali","t":"EGEHE"},{"y":"EGOV.MI","c":"BOND","t":"EGOV"},{"y":"EHYA.MI","c":"BOND","t":"EHYA"},{"y":"EIMI.MI","c":"ADVICE","t":"EIMI"},{"y":"EIMT.MI","c":"Materie","t":"EIMT"},{"y":"ELCR.MI","c":"Tematici","t":"ELCR"},{"y":"EM1015.MI","c":"BOND","t":"EM1015"},{"y":"EM35.MI","c":"BOND","t":"EM35"},{"y":"EM710.MI","c":"BOND","t":"EM710"},{"y":"EMGH.MI","c":"BOND","t":"EMGH"},{"y":"EMI.MI","c":"BOND","t":"EMI"},{"y":"EMOVE.MI","c":"Tematici","t":"EMOVE"},{"y":"EMOVJ.MI","c":"Tematici","t":"EMOVJ"},{"y":"EMQQ.MI","c":"Settoriali","t":"EMQQ"},{"y":"ENCO.MI","c":"Materie","t":"ENCO"},{"y":"ENERW.MI","c":"Settoriali","t":"ENERW"},{"y":"ENGS.MI","c":"Materie","t":"ENGS"},{"y":"ENIK.MI","c":"Materie","t":"ENIK"},{"y":"ENRG.MI","c":"Settoriali","t":"ENRG"},{"y":"ENTR.MI","c":"Materie","t":"ENTR"},{"y":"EPRA.MI","c":"Tematici","t":"EPRA"},{"y":"EPRE.MI","c":"Tematici","t":"EPRE"},{"y":"EROX.MI","c":"ADVICE","t":"EROX"},{"y":"ESGO.MI","c":"Tematici","t":"ESGO"},{"y":"ESOY.MI","c":"Materie","t":"ESOY"},{"y":"ESPO.MI","c":"Tematici","t":"ESPO"},{"y":"ESPY.MI","c":"Tematici","t":"ESPY"},{"y":"EST.MI","c":"NEW AREA","t":"EST"},{"y":"ESUG.MI","c":"Materie","t":"ESUG"},{"y":"ETFCRP.MI","c":"BOND","t":"ETFCRP"},{"y":"EUC.MI","c":"BOND","t":"EUC"},{"y":"EUES.MI","c":"BOND","t":"EUES"},{"y":"EWAT.MI","c":"Materie","t":"EWAT"},{"y":"EXS1.MI","c":"Paesi","t":"EXS1"},{"y":"EXXY.MI","c":"Materie","t":"EXXY"},{"y":"EZNC.MI","c":"Materie","t":"EZNC"},{"y":"FAMAMW.MI","c":"Tematici","t":"FAMAMW"},{"y":"FAMMAI.MI","c":"Tematici","t":"FAMMAI"},{"y":"FAMMWF.MI","c":"Tematici","t":"FAMMWF"},{"y":"FAMMWS.MI","c":"Tematici","t":"FAMMWS"},{"y":"FAMTEL.MI","c":"Tematici","t":"FAMTEL"},{"y":"FAMWCS.MI","c":"Tematici","t":"FAMWCS"},{"y":"FCRU.MI","c":"Materie","t":"FCRU"},{"y":"FGEA.MI","c":"ATTIVO","t":"FGEA"},{"y":"FINSW.MI","c":"Settoriali","t":"FINSW"},{"y":"FINX.MI","c":"Tematici","t":"FINX"},{"y":"FLUSA.MI","c":"BOND","t":"FLUSA"},{"y":"FLXI.MI","c":"Paesi","t":"FLXI"},{"y":"FLXT.MI","c":"Paesi","t":"FLXT"},{"y":"FLXU.MI","c":"Paesi","t":"FLXU"},{"y":"FMI.MI","c":"Paesi","t":"FMI"},{"y":"FOFD.MI","c":"Tematici","t":"FOFD"},{"y":"FOO.MI","c":"Settoriali","t":"FOO"},{"y":"FOOD.MI","c":"Settoriali","t":"FOOD"},{"y":"FUSU.MI","c":"ATTIVO","t":"FUSU"},{"y":"GAGG.MI","c":"BOND","t":"GAGG"},{"y":"GAGH.MI","c":"BOND","t":"GAGH"},{"y":"GAS.MI","c":"Materie","t":"GAS"},{"y":"GASRI.MI","c":"BOND","t":"GASRI"},{"y":"GCLE.MI","c":"Tematici","t":"GCLE"},{"y":"GCVE.MI","c":"BOND","t":"GCVE"},{"y":"GDIG.MI","c":"Tematici","t":"GDIG"},{"y":"GDX.MI","c":"Tematici","t":"GDX"},{"y":"GDXJ.MI","c":"Tematici","t":"GDXJ"},{"y":"GENDEE.MI","c":"Tematici","t":"GENDEE"},{"y":"GLUG.MI","c":"Tematici","t":"GLUG"},{"y":"GLUX.MI","c":"Tematici","t":"GLUX"},{"y":"GNOM.MI","c":"Tematici","t":"GNOM"},{"y":"GOAI.MI","c":"Tematici","t":"GOAI"},{"y":"GOVA.MI","c":"BOND","t":"GOVA"},{"y":"GRC.MI","c":"Paesi","t":"GRC"},{"y":"GRCTB.MI","c":"Settoriali","t":"GRCTB"},{"y":"GREAL.MI","c":"Settoriali","t":"GREAL"},{"y":"GSCE.MI","c":"Materie","t":"GSCE"},{"y":"GSM.MI","c":"Tematici","t":"GSM"},{"y":"HDRO.MI","c":"Tematici","t":"HDRO"},{"y":"HEAL.MI","c":"Tematici","t":"HEAL"},{"y":"HECB.MI","c":"BOND","t":"HECB"},{"y":"HERU.MI","c":"Tematici","t":"HERU"},{"y":"HGAE.MI","c":"BOND","t":"HGAE"},{"y":"HIDIJ.MI","c":"ATTIVO","t":"HIDIJ"},{"y":"HLT.MI","c":"Settoriali","t":"HLT"},{"y":"HLTW.MI","c":"Settoriali","t":"HLTW"},{"y":"HMXJ.MI","c":"ADVICE","t":"HMXJ"},{"y":"HNSC.MI","c":"Tematici","t":"HNSC"},{"y":"HPNA.MI","c":"Settoriali","t":"HPNA"},{"y":"HSTE.MI","c":"Paesi","t":"HSTE"},{"y":"HTWO.MI","c":"Tematici","t":"HTWO"},{"y":"HUCB.MI","c":"BOND","t":"HUCB"},{"y":"HUST.MI","c":"BOND","t":"HUST"},{"y":"HYDE.MI","c":"Tematici","t":"HYDE"},{"y":"HYGN.MI","c":"Tematici","t":"HYGN"},{"y":"HYLD.MI","c":"ADVICE","t":"HYLD"},{"y":"IAPD.MI","c":"NEW AREA","t":"IAPD"},{"y":"IBZL.MI","c":"Paesi","t":"IBZL"},{"y":"ICBR.MI","c":"Tematici","t":"ICBR"},{"y":"IEAA.MI","c":"BOND","t":"IEAA"},{"y":"IEGS.MI","c":"BOND","t":"IEGS"},{"y":"IEMB.MI","c":"ADVICE","t":"IEMB"},{"y":"IEMO.MI","c":"ATTIVO","t":"IEMO"},{"y":"IJPE.MI","c":"NEW AREA","t":"IJPE"},{"y":"IMIB.MI","c":"Paesi","t":"IMIB"},{"y":"INDG.MI","c":"Settoriali","t":"INDG"},{"y":"INDGW.MI","c":"Settoriali","t":"INDGW"},{"y":"INDI.MI","c":"Paesi","t":"INDI"},{"y":"INDO.MI","c":"Paesi","t":"INDO"},{"y":"INF1A.MI","c":"BOND","t":"INF1A"},{"y":"INFU.MI","c":"BOND","t":"INFU"},{"y":"INQQ.MI","c":"Tematici","t":"INQQ"},{"y":"INS.MI","c":"Settoriali","t":"INS"},{"y":"ISAC.MI","c":"NEW AREA","t":"ISAC"},{"y":"ISAG.MI","c":"Tematici","t":"ISAG"},{"y":"ISPY.MI","c":"Tematici","t":"ISPY"},{"y":"ITBL.MI","c":"Paesi","t":"ITBL"},{"y":"IU0E.MI","c":"BOND","t":"IU0E"},{"y":"IUSE.MI","c":"NEW AREA","t":"IUSE"},{"y":"IWDE.MI","c":"NEW AREA","t":"IWDE"},{"y":"IWMO.MI","c":"ATTIVO","t":"IWMO"},{"y":"IWVL.MI","c":"ADVICE","t":"IWVL"},{"y":"JEDI.MI","c":"Tematici","t":"JEDI"},{"y":"JRGE.MI","c":"NEW AREA","t":"JRGE"},{"y":"JU13.MI","c":"BOND","t":"JU13"},{"y":"KARS.MI","c":"Settoriali","t":"KARS"},{"y":"KOR.MI","c":"Paesi","t":"KOR"},{"y":"KRBN.MI","c":"Materie","t":"KRBN"},{"y":"KWBE.MI","c":"Tematici","t":"KWBE"},{"y":"LABL.MI","c":"Tematici","t":"LABL"},{"y":"LAFRI.MI","c":"NEW AREA","t":"LAFRI"},{"y":"LCCN.MI","c":"Paesi","t":"LCCN"},{"y":"LEAD.MI","c":"Materie","t":"LEAD"},{"y":"LGUS.MI","c":"Paesi","t":"LGUS"},{"y":"LINXB.MI","c":"ATTIVO","t":"LINXB"},{"y":"LITM.MI","c":"Tematici","t":"LITM"},{"y":"LITU.MI","c":"Tematici","t":"LITU"},{"y":"LOCK.MI","c":"Tematici","t":"LOCK"},{"y":"LTAM.MI","c":"NEW AREA","t":"LTAM"},{"y":"LVO.MI","c":"Materie","t":"LVO"},{"y":"MACV.MI","c":"ATTIVO","t":"MACV"},{"y":"MAGR.MI","c":"ATTIVO","t":"MAGR"},{"y":"MATW.MI","c":"Settoriali","t":"MATW"},{"y":"MCHN.MI","c":"Paesi","t":"MCHN"},{"y":"MCHT.MI","c":"Tematici","t":"MCHT"},{"y":"META.MI","c":"Materie","t":"META"},{"y":"METAA.MI","c":"Tematici","t":"METAA"},{"y":"METAJ.MI","c":"Tematici","t":"METAJ"},{"y":"METE.MI","c":"Tematici","t":"METE"},{"y":"METL.MI","c":"Tematici","t":"METL"},{"y":"MILL.MI","c":"Tematici","t":"MILL"},{"y":"MLPS.MI","c":"Tematici","t":"MLPS"},{"y":"MODR.MI","c":"ATTIVO","t":"MODR"},{"y":"MTAV.MI","c":"Tematici","t":"MTAV"},{"y":"MTVS.MI","c":"Tematici","t":"MTVS"},{"y":"NATO.MI","c":"Settoriali","t":"NATO"},{"y":"NCLR.MI","c":"Tematici","t":"NCLR"},{"y":"NGAS.MI","c":"Materie","t":"NGAS"},{"y":"NICK.MI","c":"Materie","t":"NICK"},{"y":"NRJC.MI","c":"Tematici","t":"NRJC"},{"y":"NTSG.MI","c":"ATTIVO","t":"NTSG"},{"y":"NUCL.MI","c":"Tematici","t":"NUCL"},{"y":"OCEAN.MI","c":"Settoriali","t":"OCEAN"},{"y":"OIH.MI","c":"Tematici","t":"OIH"},{"y":"OVER.MI","c":"BOND","t":"OVER"},{"y":"PAVE.MI","c":"Tematici","t":"PAVE"},{"y":"PCOM.MI","c":"Materie","t":"PCOM"},{"y":"PHAG.MI","c":"Materie","t":"PHAG"},{"y":"PHPD.MI","c":"Materie","t":"PHPD"},{"y":"PHPM.MI","c":"Materie","t":"PHPM"},{"y":"PHPT.MI","c":"Materie","t":"PHPT"},{"y":"PJSR.MI","c":"BOND","t":"PJSR"},{"y":"QNTM.MI","c":"Tematici","t":"QNTM"},{"y":"QTOP.MI","c":"Paesi","t":"QTOP"},{"y":"QUAD.MI","c":"Tematici","t":"QUAD"},{"y":"RARE.MI","c":"Tematici","t":"RARE"},{"y":"RAYZ.MI","c":"Tematici","t":"RAYZ"},{"y":"RBOT.MI","c":"ADVICE","t":"RBOT"},{"y":"REMX.MI","c":"Tematici","t":"REMX"},{"y":"RENW.MI","c":"Tematici","t":"RENW"},{"y":"REUS.MI","c":"Tematici","t":"REUS"},{"y":"REUSE.MI","c":"Settoriali","t":"REUSE"},{"y":"RNRG.MI","c":"Tematici","t":"RNRG"},{"y":"ROBO.MI","c":"Tematici","t":"ROBO"},{"y":"ROE.MI","c":"Tematici","t":"ROE"},{"y":"SAUDI.MI","c":"Paesi","t":"SAUDI"},{"y":"SAUS.MI","c":"Paesi","t":"SAUS"},{"y":"SBIO.MI","c":"Settoriali","t":"SBIO"},{"y":"SCITY.MI","c":"Tematici","t":"SCITY"},{"y":"SDG9.MI","c":"Tematici","t":"SDG9"},{"y":"SEMA.MI","c":"NEW AREA","t":"SEMA"},{"y":"SEME.MI","c":"Tematici","t":"SEME"},{"y":"SGBS.MI","c":"Materie","t":"SGBS"},{"y":"SHEME.MI","c":"BOND","t":"SHEME"},{"y":"SILV.MI","c":"Tematici","t":"SILV"},{"y":"SJPA.MI","c":"NEW AREA","t":"SJPA"},{"y":"SMCX.MI","c":"ADVICE","t":"SMCX"},{"y":"SMEA.MI","c":"ADVICE","t":"SMEA"},{"y":"SMH.MI","c":"Tematici","t":"SMH"},{"y":"SNSR.MI","c":"Tematici","t":"SNSR"},{"y":"SOLR.MI","c":"Tematici","t":"SOLR"},{"y":"SOYB.MI","c":"Materie","t":"SOYB"},{"y":"SOYO.MI","c":"Materie","t":"SOYO"},{"y":"SP1E.MI","c":"Paesi","t":"SP1E"},{"y":"SP5A.MI","c":"ADVICE","t":"SP5A"},{"y":"SPXE.MI","c":"Paesi","t":"SPXE"},{"y":"SPXJ.MI","c":"Paesi","t":"SPXJ"},{"y":"SPY5.MI","c":"Paesi","t":"SPY5"},{"y":"SRIUC.MI","c":"BOND","t":"SRIUC"},{"y":"SRSA.MI","c":"Paesi","t":"SRSA"},{"y":"STAW.MI","c":"Settoriali","t":"STAW"},{"y":"DFSV.DE","c":"SPDR EURO","t":"DFSV"},{"y":"STKX.MI","c":"SPDR EURO","t":"STKX"},{"y":"STNX.MI","c":"SPDR EURO","t":"STNX"},{"y":"STPX.MI","c":"SPDR EURO","t":"STPX"},{"y":"STQX.MI","c":"SPDR EURO","t":"STQX"},{"y":"STRX.MI","c":"SPDR EURO","t":"STRX"},{"y":"STSX.MI","c":"SPDR EURO","t":"STSX"},{"y":"STTX.MI","c":"SPDR EURO","t":"STTX"},{"y":"STUX.MI","c":"SPDR EURO","t":"STUX"},{"y":"SUGA.MI","c":"Materie","t":"SUGA"},{"y":"SW2CHB.MI","c":"Paesi","t":"SW2CHB"},{"y":"SWDA.MI","c":"ADVICE","t":"SWDA"},{"y":"SXLB.MI","c":"SPDR USA","t":"SXLB"},{"y":"SXLC.MI","c":"SPDR USA","t":"SXLC"},{"y":"SXLF.MI","c":"SPDR USA","t":"SXLF"},{"y":"SXLI.MI","c":"SPDR USA","t":"SXLI"},{"y":"SXLK.MI","c":"SPDR USA","t":"SXLK"},{"y":"SXLP.MI","c":"SPDR USA","t":"SXLP"},{"y":"SXLU.MI","c":"SPDR USA","t":"SXLU"},{"y":"SXLV.MI","c":"SPDR USA","t":"SXLV"},{"y":"SXLY.MI","c":"SPDR USA","t":"SXLY"},{"y":"T10A.MI","c":"BOND","t":"T10A"},{"y":"TELE.MI","c":"Settoriali","t":"TELE"},{"y":"TELEW.MI","c":"Settoriali","t":"TELEW"},{"y":"TIP1A.MI","c":"BOND","t":"TIP1A"},{"y":"TLCO.MI","c":"Tematici","t":"TLCO"},{"y":"TNO.MI","c":"Settoriali","t":"TNO"},{"y":"TNOW.MI","c":"Settoriali","t":"TNOW"},{"y":"TRVL.MI","c":"Settoriali","t":"TRVL"},{"y":"TTFW.MI","c":"Materie","t":"TTFW"},{"y":"TUR.MI","c":"Paesi","t":"TUR"},{"y":"U3O8.MI","c":"Tematici","t":"U3O8"},{"y":"UCRP.MI","c":"BOND","t":"UCRP"},{"y":"UGAS.MI","c":"Materie","t":"UGAS"},{"y":"UKE.MI","c":"Paesi","t":"UKE"},{"y":"UNIC.MI","c":"Tematici","t":"UNIC"},{"y":"URNJ.MI","c":"Tematici","t":"URNJ"},{"y":"URNU.MI","c":"ADVICE","t":"URNU"},{"y":"US1.MI","c":"BOND","t":"US1"},{"y":"US10C.MI","c":"BOND","t":"US10C"},{"y":"US7.MI","c":"BOND","t":"US7"},{"y":"USCBC.MI","c":"BOND","t":"USCBC"},{"y":"USIC.MI","c":"BOND","t":"USIC"},{"y":"USIG.MI","c":"BOND","t":"USIG"},{"y":"USTEC.MI","c":"Tematici","t":"USTEC"},{"y":"UTI.MI","c":"Settoriali","t":"UTI"},{"y":"UTIW.MI","c":"Settoriali","t":"UTIW"},{"y":"VAGF.MI","c":"BOND","t":"VAGF"},{"y":"VCDE.MI","c":"BOND","t":"VCDE"},{"y":"VDCA.MI","c":"BOND","t":"VDCA"},{"y":"VDCE.MI","c":"BOND","t":"VDCE"},{"y":"VDEA.MI","c":"BOND","t":"VDEA"},{"y":"VDST.MI","c":"BOND","t":"VDST"},{"y":"VECA.MI","c":"BOND","t":"VECA"},{"y":"VEGI.MI","c":"Tematici","t":"VEGI"},{"y":"VGEA.MI","c":"BOND","t":"VGEA"},{"y":"VITA.MI","c":"Settoriali","t":"VITA"},{"y":"VITU.MI","c":"Settoriali","t":"VITU"},{"y":"VJPE.MI","c":"Paesi","t":"VJPE"},{"y":"VNGA20.MI","c":"ATTIVO","t":"VNGA20"},{"y":"VNGA40.MI","c":"ATTIVO","t":"VNGA40"},{"y":"VNGA60.MI","c":"ATTIVO","t":"VNGA60"},{"y":"VNGA80.MI","c":"ATTIVO","t":"VNGA80"},{"y":"VOLT.MI","c":"Tematici","t":"VOLT"},{"y":"VPN.MI","c":"Tematici","t":"VPN"},{"y":"VSCF.MI","c":"BOND","t":"VSCF"},{"y":"VSGF.MI","c":"BOND","t":"VSGF"},{"y":"VUCE.MI","c":"BOND","t":"VUCE"},{"y":"VUKE.MI","c":"Paesi","t":"VUKE"},{"y":"VUSA.MI","c":"Paesi","t":"VUSA"},{"y":"WATC.MI","c":"Tematici","t":"WATC"},{"y":"WATT.MI","c":"Materie","t":"WATT"},{"y":"WBLK.MI","c":"Tematici","t":"WBLK"},{"y":"WCBR.MI","c":"Tematici","t":"WCBR"},{"y":"WCCA.MI","c":"Materie","t":"WCCA"},{"y":"WCLD.MI","c":"Settoriali","t":"WCLD"},{"y":"WCOA.MI","c":"Materie","t":"WCOA"},{"y":"WCOD.MI","c":"SPDR WORLD","t":"WCOD"},{"y":"WCOE.MI","c":"Materie","t":"WCOE"},{"y":"WCOS.MI","c":"SPDR WORLD","t":"WCOS"},{"y":"WDEF.MI","c":"Tematici","t":"WDEF"},{"y":"WDNA.MI","c":"Tematici","t":"WDNA"},{"y":"WEAT.MI","c":"Materie","t":"WEAT"},{"y":"WEB3.MI","c":"Tematici","t":"WEB3"},{"y":"WENT.MI","c":"Materie","t":"WENT"},{"y":"WENU.MI","c":"Materie","t":"WENU"},{"y":"WFIN.MI","c":"SPDR WORLD","t":"WFIN"},{"y":"WGRO.MI","c":"Tematici","t":"WGRO"},{"y":"WHEA.MI","c":"SPDR WORLD","t":"WHEA"},{"y":"WIND.MI","c":"SPDR WORLD","t":"WIND"},{"y":"WMAT.MI","c":"SPDR WORLD","t":"WMAT"},{"y":"WMGT.MI","c":"Tematici","t":"WMGT"},{"y":"WMIB.MI","c":"Paesi","t":"WMIB"},{"y":"WNAS.MI","c":"Paesi","t":"WNAS"},{"y":"WNDE.MI","c":"Tematici","t":"WNDE"},{"y":"WNDY.MI","c":"Tematici","t":"WNDY"},{"y":"WNRG.MI","c":"SPDR WORLD","t":"WNRG"},{"y":"WRNW.MI","c":"Tematici","t":"WRNW"},{"y":"WRTY.MI","c":"Paesi","t":"WRTY"},{"y":"WS5X.MI","c":"Paesi","t":"WS5X"},{"y":"WSLV.MI","c":"Tematici","t":"WSLV"},{"y":"WSPE.MI","c":"Paesi","t":"WSPE"},{"y":"WSPX.MI","c":"Paesi","t":"WSPX"},{"y":"WTAI.MI","c":"Tematici","t":"WTAI"},{"y":"WTEC.MI","c":"SPDR WORLD","t":"WTEC"},{"y":"WTEL.MI","c":"SPDR WORLD","t":"WTEL"},{"y":"WTI.MI","c":"Materie","t":"WTI"},{"y":"WTID.MI","c":"Materie","t":"WTID"},{"y":"WTRE.MI","c":"Tematici","t":"WTRE"},{"y":"WUTI.MI","c":"SPDR WORLD","t":"WUTI"},{"y":"X25E.MI","c":"BOND","t":"X25E"},{"y":"X7PS.MI","c":"Settoriali","t":"X7PS"},{"y":"XAGZ.MI","c":"Materie","t":"XAGZ"},{"y":"XAIX.MI","c":"ADVICE","t":"XAIX"},{"y":"XBAE.MI","c":"BOND","t":"XBAE"},{"y":"XBAG.MI","c":"BOND","t":"XBAG"},{"y":"XBLC.MI","c":"BOND","t":"XBLC"},{"y":"XBNK.MI","c":"BOND","t":"XBNK"},{"y":"XCHA.MI","c":"Paesi","t":"XCHA"},{"y":"XCS5.MI","c":"Paesi","t":"XCS5"},{"y":"XCTE.MI","c":"Tematici","t":"XCTE"},{"y":"XDAX.MI","c":"Paesi","t":"XDAX"},{"y":"XDBC.MI","c":"Materie","t":"XDBC"},{"y":"XDEE.MI","c":"NEW AREA","t":"XDEE"},{"y":"XDER.MI","c":"Tematici","t":"XDER"},{"y":"XDEV.MI","c":"ADVICE","t":"XDEV"},{"y":"XDG3.MI","c":"Tematici","t":"XDG3"},{"y":"XDG6.MI","c":"Tematici","t":"XDG6"},{"y":"XDG7.MI","c":"Tematici","t":"XDG7"},{"y":"XDGI.MI","c":"Tematici","t":"XDGI"},{"y":"XDRE.MI","c":"Settoriali","t":"XDRE"},{"y":"XDW0.MI","c":"Settoriali","t":"XDW0"},{"y":"XDWC.MI","c":"Settoriali","t":"XDWC"},{"y":"XDWF.MI","c":"Settoriali","t":"XDWF"},{"y":"XDWH.MI","c":"Settoriali","t":"XDWH"},{"y":"XDWI.MI","c":"Settoriali","t":"XDWI"},{"y":"XDWM.MI","c":"Settoriali","t":"XDWM"},{"y":"XDWS.MI","c":"Settoriali","t":"XDWS"},{"y":"XDWT.MI","c":"Settoriali","t":"XDWT"},{"y":"XDWU.MI","c":"Settoriali","t":"XDWU"},{"y":"XE01.MI","c":"BOND","t":"XE01"},{"y":"XEON.MI","c":"Liquidità","t":"XEON"},{"y":"XFNT.MI","c":"Tematici","t":"XFNT"},{"y":"XFVT.MI","c":"Paesi","t":"XFVT"},{"y":"XG11.MI","c":"Tematici","t":"XG11"},{"y":"XG12.MI","c":"Tematici","t":"XG12"},{"y":"XGEN.MI","c":"Tematici","t":"XGEN"},{"y":"XGLE.MI","c":"BOND","t":"XGLE"},{"y":"XIFE.MI","c":"Settoriali","t":"XIFE"},{"y":"XLBS.MI","c":"Settoriali","t":"XLBS"},{"y":"XLCS.MI","c":"Settoriali","t":"XLCS"},{"y":"XLES.MI","c":"Settoriali","t":"XLES"},{"y":"XLFS.MI","c":"Settoriali","t":"XLFS"},{"y":"XLIS.MI","c":"Settoriali","t":"XLIS"},{"y":"XLKS.MI","c":"Settoriali","t":"XLKS"},{"y":"XLPE.MI","c":"Tematici","t":"XLPE"},{"y":"XLPS.MI","c":"Settoriali","t":"XLPS"},{"y":"XLUS.MI","c":"Settoriali","t":"XLUS"},{"y":"XLVS.MI","c":"Settoriali","t":"XLVS"},{"y":"XLYS.MI","c":"Settoriali","t":"XLYS"},{"y":"D5BI.DE","c":"Paesi","t":"D5BI"},{"y":"XMME.MI","c":"ADVICE","t":"XMME"},{"y":"XMOV.MI","c":"Tematici","t":"XMOV"},{"y":"XNGI.MI","c":"Tematici","t":"XNGI"},{"y":"XNNV.MI","c":"Tematici","t":"XNNV"},{"y":"XQUI.MI","c":"ATTIVO","t":"XQUI"},{"y":"XRES.MI","c":"Tematici","t":"XRES"},{"y":"XS8R.MI","c":"Tematici","t":"XS8R"},{"y":"XSFR.MI","c":"Paesi","t":"XSFR"},{"y":"XSGI.MI","c":"Tematici","t":"XSGI"},{"y":"XSMI.MI","c":"Paesi","t":"XSMI"},{"y":"XSX6.MI","c":"ADVICE","t":"XSX6"},{"y":"XT01.MI","c":"BOND","t":"XT01"},{"y":"XTC5.MI","c":"BOND","t":"XTC5"},{"y":"XTIP.MI","c":"BOND","t":"XTIP"},{"y":"XUSA.MI","c":"ATTIVO","t":"XUSA"},{"y":"XUTC.MI","c":"Settoriali","t":"XUTC"},{"y":"XWTS.MI","c":"Settoriali","t":"XWTS"},{"y":"XXSC.MI","c":"ATTIVO","t":"XXSC"},{"y":"XYP0.MI","c":"BOND","t":"XYP0"},{"y":"ZINC.MI","c":"Materie","t":"ZINC"},{"y":"EIDO","c":"Paesi","t":"EIDO"},{"y":"EIRL","c":"Paesi","t":"EIRL"},{"y":"IMOM","c":"ATTIVO","t":"IMOM"},{"y":"DBMFE.PA","c":"ATTIVO","t":"DBMFE"},{"y":"MEUD.PA","c":"NEW AREA","t":"MEUD"},{"y":"WRD.PA","c":"Paesi","t":"WRD"},{"y":"IB01.SW","c":"BOND","t":"IB01"},{"y":"SDGPEX.SW","c":"ATTIVO","t":"SDGPEX"},{"y":"X13E.MI","c":"Liquidità","t":"X13E"},{"y":"EM13.MI","c":"Liquidità","t":"EM13"},{"y":"ERNE.MI","c":"Liquidità","t":"ERNE"},{"y":"INFR.MI","c":"Tematici","t":"INFR"},{"y":"swda.MI","c":"benchmark","t":"SWDA"},{"y":"xdwd.MI","c":"benchmark","t":"XDWD"},{"y":"cw8.MI","c":"benchmark","t":"CW8"},{"y":"imeu.MI","c":"benchmark","t":"IMEU"},{"y":"inaa.MI","c":"benchmark","t":"INAA"},{"y":"SXLE.MI","c":"SPDR USA","t":"SXLE"},{"y":"MGIN.MI","c":"SPDR USA","t":"MGIN"},{"y":"STWX.MI","c":"SPDR EURO","t":"STWX"},{"y":"STZX.MI","c":"SPDR EURO","t":"STZX"},{"y":"SWRD.MI","c":"benchmark","t":"SWRD"},{"y":"600X.MI","c":"benchmark","t":"600X"},{"y":"EIS","c":"Paesi","t":"EIS"},{"y":"ENZL","c":"Paesi","t":"ENZL"},{"y":"EPHE","c":"Paesi","t":"EPHE"},{"y":"EPI","c":"Paesi","t":"EPI"},{"y":"EPOL","c":"Paesi","t":"EPOL"},{"y":"EPU","c":"Paesi","t":"EPU"},{"y":"EWA","c":"Paesi","t":"EWA"},{"y":"EWC","c":"Paesi","t":"EWC"},{"y":"EWD","c":"Paesi","t":"EWD"},{"y":"EWG","c":"Paesi","t":"EWG"},{"y":"EWH","c":"Paesi","t":"EWH"},{"y":"EWI","c":"Paesi","t":"EWI"},{"y":"EWJ","c":"Paesi","t":"EWJ"},{"y":"EWK","c":"Paesi","t":"EWK"},{"y":"EWL","c":"Paesi","t":"EWL"},{"y":"EWM","c":"Paesi","t":"EWM"},{"y":"EWN","c":"Paesi","t":"EWN"},{"y":"EWO","c":"Paesi","t":"EWO"},{"y":"EWP","c":"Paesi","t":"EWP"},{"y":"EWQ","c":"Paesi","t":"EWQ"},{"y":"EWS","c":"Paesi","t":"EWS"},{"y":"EWT","c":"Paesi","t":"EWT"},{"y":"EWU","c":"Paesi","t":"EWU"},{"y":"EWW","c":"Paesi","t":"EWW"},{"y":"EWY","c":"Paesi","t":"EWY"},{"y":"EWZ","c":"Paesi","t":"EWZ"},{"y":"EZA","c":"Paesi","t":"EZA"},{"y":"FM.TO","c":"Paesi","t":"FM"},{"y":"GREK","c":"Paesi","t":"GREK"},{"y":"GXG","c":"Paesi","t":"GXG"},{"y":"ICLN","c":"Tematici","t":"ICLN"},{"y":"ILF","c":"Paesi","t":"ILF"},{"y":"MES","c":"Paesi","t":"MES"},{"y":"NORW","c":"Paesi","t":"NORW"},{"y":"QQQ","c":"Paesi","t":"QQQ"},{"y":"SPLV","c":"Paesi","t":"SPLV"},{"y":"SPY","c":"Paesi","t":"SPY"},{"y":"THD","c":"Paesi","t":"THD"},{"y":"UAE","c":"Paesi","t":"UAE"},{"y":"VNM","c":"Paesi","t":"VNM"},{"y":"VPL","c":"Paesi","t":"VPL"},{"y":"ADS.DE","c":"EUROGROW","t":"ADS"},{"y":"ADYEN.AS","c":"EUROGROW","t":"ADYEN"},{"y":"AI.PA","c":"EUROGROW","t":"AI"},{"y":"AIR.PA","c":"EUROGROW","t":"AIR"},{"y":"AM.PA","c":"EUROGROW","t":"AM"},{"y":"ARGX","c":"EUROGROW","t":"ARGX"},{"y":"ASM.SW","c":"EUROGROW","t":"ASM"},{"y":"ASML.SW","c":"EUROGROW","t":"ASML"},{"y":"BEI.DE","c":"EUROGROW","t":"BEI"},{"y":"CBK.DE","c":"EUROGROW","t":"CBK"},{"y":"DB1.DE","c":"EUROGROW","t":"DB1"},{"y":"DIM.PA","c":"EUROGROW","t":"DIM"},{"y":"DSY.PA","c":"EUROGROW","t":"DSY"},{"y":"DTE.DE","c":"EUROGROW","t":"DTE"},{"y":"EL.PA","c":"EUROGROW","t":"EL"},{"y":"ELE.MC","c":"EUROGROW","t":"ELE"},{"y":"ENR.DE","c":"EUROGROW","t":"ENR"},{"y":"FER.MC","c":"EUROGROW","t":"FER"},{"y":"HEI.DE","c":"EUROGROW","t":"HEI"},{"y":"HO.PA","c":"EUROGROW","t":"HO"},{"y":"IFX.DE","c":"EUROGROW","t":"IFX"},{"y":"ITX.VI","c":"EUROGROW","t":"ITX"},{"y":"KNEBV.HE","c":"EUROGROW","t":"KNEBV"},{"y":"LDO.MI","c":"EUROGROW","t":"LDO"},{"y":"LR.PA","c":"EUROGROW","t":"LR"},{"y":"MC.PA","c":"EUROGROW","t":"MC"},{"y":"NOKIA.HE","c":"EUROGROW","t":"NOKIA"},{"y":"OR.PA","c":"EUROGROW","t":"OR"},{"y":"PRX.AS","c":"EUROGROW","t":"PRX"},{"y":"PRY.MI","c":"EUROGROW","t":"PRY"},{"y":"RACE.MI","c":"EUROGROW","t":"RACE"},{"y":"RHM.DE","c":"EUROGROW","t":"RHM"},{"y":"RMS.PA","c":"EUROGROW","t":"RMS"},{"y":"RYA.IR","c":"EUROGROW","t":"RYA"},{"y":"SAF.PA","c":"EUROGROW","t":"SAF"},{"y":"SAP.DE","c":"EUROGROW","t":"SAP"},{"y":"SHL.DE","c":"EUROGROW","t":"SHL"},{"y":"SIE.DE","c":"EUROGROW","t":"SIE"},{"y":"SRT.DE","c":"EUROGROW","t":"SRT"},{"y":"STMMI.PA","c":"EUROGROW","t":"STMMI"},{"y":"SU.PA","c":"EUROGROW","t":"SU"},{"y":"UCB","c":"EUROGROW","t":"UCB"},{"y":"UCG.MI","c":"EUROGROW","t":"UCG"},{"y":"UMG.AS","c":"EUROGROW","t":"UMG"},{"y":"WKL.VI","c":"EUROGROW","t":"WKL"}
+];
+const TICKERS_STOOQ=TICKERS_YAHOO.filter(t=>/\.(MI|DE|PA|AS|F|L|SW|WA|IR|VI|MC|HE)$/.test(t.y));
+let TICKERS=TICKERS_YAHOO;
+
+// ═══ LOAD JSON ═══
 async function loadFromJSON(){
   const tsEl=document.getElementById('tsText');
-  const tsBar=document.getElementById('tsBar');
-  tsBar.style.display='flex';
-  tsEl.innerHTML='⏳ <strong>Carico dati da GitHub...</strong> attendere';
+  tsEl.innerHTML='⏳ Carico dati da GitHub...';
   try{
-    const res=await fetch(JSON_URL);
+    const res=await fetch(JSON_URL+'?t='+Date.now());
     if(!res.ok) throw new Error('HTTP '+res.status);
     const obj=await res.json();
     if(!obj.data||!obj.data.length) throw new Error('JSON vuoto');
-
-    // Controlla freschezza
     const dt=new Date(obj.timestamp);
     const ageH=(Date.now()-dt.getTime())/3600000;
     const ageStr=ageH<1?Math.round(ageH*60)+' min fa':Math.round(ageH)+'h fa';
-
-    // Mappa nomi campo JSON verso nomi interni RAPTOR One
-    allResults=(obj.data||[]).map(function(d){
-      return Object.assign({},d,{
-        tipo:      d.segnale||'',
-        y:         d.yahoo||'',
-        price:     d.prezzo||0,
-        pkPct:     d.kpct||0,
-        cross:     d.crossDays!=null?d.crossDays:999,
-        aoPos:     (d.ao||0)>0,
-        mmAlign:   false,
-        error:     null
-      });
-    });
-    const freshIcon = ageH<=MAX_AGE_HOURS ? '🟢' : '🟡';
-    const freshMsg  = ageH<=MAX_AGE_HOURS ? 'dati aggiornati' : 'dati vecchi — premi CALCOLA per aggiornare';
+    allResults=(obj.data||[]).map(d=>Object.assign({},d,{tipo:d.segnale||'',y:d.yahoo||'',price:d.prezzo||0,pkPct:d.kpct||0,cross:d.crossDays!=null?d.crossDays:999,aoPos:(d.ao||0)>0,mmAlign:false,error:null}));
+    const freshIcon=ageH<=MAX_AGE_HOURS?'🟢':'🟡';
+    const freshMsg=ageH<=MAX_AGE_HOURS?'dati aggiornati':'dati vecchi — premi CALCOLA per aggiornare';
     tsEl.innerHTML=`${freshIcon} Aggiornato: <strong>${obj.timestamp_it}</strong> (${ageStr}) · ${obj.ok}/${obj.total} ticker · ${freshMsg}`;
-
     document.getElementById('hTotal').textContent=obj.total;
-    updateStats(); renderTable();
+    updateStats();renderTable();
     return true;
   }catch(e){
     tsEl.textContent='⚠️ JSON non disponibile — premi CALCOLA per scan manuale ('+e.message+')';
@@ -914,314 +322,84 @@ async function loadFromJSON(){
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  INIT TABLE MODE
-// ═══════════════════════════════════════════════════════════════════
-function initTableMode(){
-  document.getElementById('hTotal').textContent=TICKERS.length;
-  document.getElementById('tsBar').style.display='flex';
+// ═══ INDICATORS ═══
+function sma(arr,n){return arr.map((_,i)=>i<n-1?null:arr.slice(i-n+1,i+1).reduce((a,b)=>a+(b||0),0)/n);}
+function emaArr(arr,p){const k=2/(p+1);const out=[arr[0]];for(let i=1;i<arr.length;i++)out.push(arr[i]*k+out[i-1]*(1-k));return out;}
+function calcKAMA(close,n=10,fast=2,slow=30){const fsc=2/(fast+1),ssc=2/(slow+1);const kama=new Array(close.length).fill(null);kama[n]=close[n];for(let i=n+1;i<close.length;i++){const dir=Math.abs(close[i]-close[i-n]);let noise=0;for(let j=i-n+1;j<=i;j++)noise+=Math.abs(close[j]-close[j-1]);const er=noise===0?0:dir/noise;const sc=Math.pow(er*(fsc-ssc)+ssc,2);kama[i]=kama[i-1]+sc*(close[i]-kama[i-1]);}return kama;}
+function calcER(close,n=10){if(close.length<n+1)return 0;const dir=Math.abs(close[close.length-1]-close[close.length-1-n]);let noise=0;for(let i=close.length-n;i<close.length;i++)noise+=Math.abs(close[i]-close[i-1]);return noise===0?0:dir/noise;}
+function calcRSI(close,n=14){if(close.length<n+1)return null;let g=0,l=0;for(let i=close.length-n;i<close.length;i++){const d=close[i]-close[i-1];if(d>0)g+=d;else l-=d;}const ag=g/n,al=l/n;return al===0?100:100-(100/(1+ag/al));}
+function calcAO(high,low){const mid=high.map((h,i)=>(h+low[i])/2);const s5=sma(mid,5),s34=sma(mid,34);return s5.map((v,i)=>v!==null&&s34[i]!==null?v-s34[i]:null);}
+function calcBaf(ao){let b=0;for(let i=ao.length-1;i>0;i--){if(ao[i]!==null&&ao[i-1]!==null&&ao[i]>ao[i-1])b++;else break;}return b;}
+function trendycator(close){if(close.length<55)return'GRIGIO';const e21=emaArr(close,21),e55=emaArr(close,55);const n=e21.length-1;if(e21[n]>e55[n]&&e21[n]>e21[n-1])return'VERDE';if(e21[n]<e55[n]&&e21[n]<e21[n-1])return'ROSSO';return'GRIGIO';}
+function calcVolRatio(volume){if(volume.length<21)return 1;const avg20=volume.slice(-21,-1).reduce((a,b)=>a+b,0)/20;return avg20===0?1:volume[volume.length-1]/avg20;}
+function entryDate(close,kama,timestamps){for(let i=close.length-1;i>0;i--){if(kama[i]!==null&&kama[i-1]!==null&&close[i]>kama[i]&&close[i-1]<=kama[i-1]){const d=new Date(timestamps[i]*1000);return d.getDate().toString().padStart(2,'0')+'/'+(d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getFullYear();}}return'—';}
+function calcATR(h,l,c,n=14){if(c.length<n+1)return null;const tr=c.map((_,i)=>i===0?h[i]-l[i]:Math.max(h[i]-l[i],Math.abs(h[i]-c[i-1]),Math.abs(l[i]-c[i-1])));let atr=tr.slice(1,n+1).reduce((a,b)=>a+b,0)/n;for(let i=n+1;i<tr.length;i++)atr=(atr*(n-1)+tr[i])/n;return atr;}
+function calcHA(o,h,l,c){const haO=[],haH=[],haL=[],haC=[];haO.push((o[0]+c[0])/2);haC.push((o[0]+h[0]+l[0]+c[0])/4);haH.push(Math.max(h[0],haO[0],haC[0]));haL.push(Math.min(l[0],haO[0],haC[0]));for(let i=1;i<c.length;i++){const nc=(o[i]+h[i]+l[i]+c[i])/4,no=(haO[i-1]+haC[i-1])/2;haO.push(no);haC.push(nc);haH.push(Math.max(h[i],no,nc));haL.push(Math.min(l[i],no,nc));}return{haO,haH,haL,haC};}
+function checkMR(close,kama,er,rsi,ao){const lc=close[close.length-1],lk=kama[kama.length-1],lao=ao[ao.length-1],lao1=ao[ao.length-2];const nearKama=lk!=null&&Math.abs(lc-lk)/lk<0.03;const aoUp=lao!=null&&lao1!=null&&lao>lao1;return er<0.3&&(rsi||100)<30&&aoUp&&(nearKama||lc<(lk||lc));}
 
-  // 1. Prova a caricare il JSON da GitHub
-  loadFromJSON().then(ok=>{
-    if(!ok){
-      // 2. Fallback: prova la cache localStorage
-      const src=document.getElementById('srcSelect').value;
-      try{
-        const saved=localStorage.getItem('raptor_one_'+src);
-        if(saved){
-          const obj=JSON.parse(saved);
-          allResults=obj.data||[];
-          document.getElementById('tsText').textContent='📦 Cache locale: '+(obj.ts||'—')+' — premi CALCOLA per aggiornare';
-          updateStats(); renderTable();
-        }
-      }catch(e){}
-    }
-  });
-
-  document.getElementById('srcSelect').addEventListener('change',()=>{
-    TICKERS=document.getElementById('srcSelect').value==='stooq'?TICKERS_STOOQ:TICKERS_YAHOO;
-    allResults=[];
-    document.getElementById('hTotal').textContent=TICKERS.length;
-    // Al cambio fonte ricarica il JSON (contiene tutti i ticker)
-    loadFromJSON();
-  });
-}
-
-// ═══════════════════════════════════════════════════════════════════
-//  FETCH YAHOO
-// ═══════════════════════════════════════════════════════════════════
-async function fetchYahoo(symbol, interval='1d', range='1y'){
-  const url='https://query1.finance.yahoo.com/v8/finance/chart/'+symbol+
-    '?interval='+interval+'&range='+range+'&includePrePost=false';
-  const proxies=[
-    'https://corsproxy.io/?'+encodeURIComponent(url),
-    'https://api.allorigins.win/raw?url='+encodeURIComponent(url),
-    'https://thingproxy.freeboard.io/fetch/'+url
-  ];
+// ═══ FETCH ═══
+async function fetchYahoo(symbol,interval='1d',range='1y'){
+  const url='https://query1.finance.yahoo.com/v8/finance/chart/'+symbol+'?interval='+interval+'&range='+range+'&includePrePost=false';
+  const proxies=['https://corsproxy.io/?'+encodeURIComponent(url),'https://api.allorigins.win/raw?url='+encodeURIComponent(url)];
   let lastErr;
-  for(const proxy of proxies){
-    try{
-      const res=await fetch(proxy,{signal:AbortSignal.timeout(10000)});
-      if(!res.ok) throw new Error('HTTP '+res.status);
-      const j=await res.json();
-      const result=j?.chart?.result?.[0];
-      if(!result) throw new Error('No data');
-      return result;
-    }catch(e){ lastErr=e; }
-  }
+  for(const proxy of proxies){try{const res=await fetch(proxy,{signal:AbortSignal.timeout(10000)});if(!res.ok)throw new Error('HTTP '+res.status);const j=await res.json();const result=j?.chart?.result?.[0];if(!result)throw new Error('No data');return result;}catch(e){lastErr=e;}}
   throw lastErr||new Error('All proxies failed');
 }
-
-// ═══════════════════════════════════════════════════════════════════
-//  FETCH STOOQ
-// ═══════════════════════════════════════════════════════════════════
 async function fetchStooq(symbol){
   const s=symbol.toLowerCase();
   const url='https://stooq.com/q/d/l/?s='+s+'&i=d';
   const proxy='https://corsproxy.io/?'+encodeURIComponent(url);
   const res=await fetch(proxy,{signal:AbortSignal.timeout(9000)});
-  if(!res.ok) throw new Error('HTTP '+res.status);
+  if(!res.ok)throw new Error('HTTP '+res.status);
   const text=await res.text();
-  if(!text||text.includes('No data')||text.trim().length<50) throw new Error('No data');
+  if(!text||text.includes('No data')||text.trim().length<50)throw new Error('No data');
   const lines=text.trim().split('\n');
-  if(!lines[0].toLowerCase().includes('close')) throw new Error('Bad CSV');
+  if(!lines[0].toLowerCase().includes('close'))throw new Error('Bad CSV');
   const rows=lines.slice(1).reverse();
   const closes=[],highs=[],lows=[],vols=[],timestamps=[];
-  for(const row of rows){
-    const p2=row.split(',');
-    if(p2.length<5) continue;
-    const dt=new Date(p2[0]);
-    const h=parseFloat(p2[2]),l=parseFloat(p2[3]),c=parseFloat(p2[4]),v2=parseFloat(p2[5])||0;
-    if(isNaN(c)||c<=0) continue;
-    closes.push(c);highs.push(h);lows.push(l);vols.push(v2);
-    timestamps.push(Math.floor(dt.getTime()/1000));
-  }
-  if(closes.length<60) throw new Error('Dati insuff.');
+  for(const row of rows){const p2=row.split(',');if(p2.length<5)continue;const dt=new Date(p2[0]);const h=parseFloat(p2[2]),l=parseFloat(p2[3]),c=parseFloat(p2[4]),v=parseFloat(p2[5])||0;if(isNaN(c)||c<=0)continue;closes.push(c);highs.push(h);lows.push(l);vols.push(v);timestamps.push(Math.floor(dt.getTime()/1000));}
+  if(closes.length<60)throw new Error('Dati insuff.');
   return{closes,highs,lows,vols,timestamps};
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  INDICATORS
-// ═══════════════════════════════════════════════════════════════════
-function sma(arr,n){return arr.map((_,i)=>i<n-1?null:arr.slice(i-n+1,i+1).reduce((a,b)=>a+(b||0),0)/n);}
-function emaArr(arr,p){
-  const k=2/(p+1);const out=[arr[0]];
-  for(let i=1;i<arr.length;i++) out.push(arr[i]*k+out[i-1]*(1-k));
-  return out;
-}
-function calcKAMA(close,n=10,fast=2,slow=30){
-  const fastSC=2/(fast+1),slowSC=2/(slow+1);
-  const kama=new Array(close.length).fill(null);
-  kama[n]=close[n];
-  for(let i=n+1;i<close.length;i++){
-    const dir=Math.abs(close[i]-close[i-n]);
-    let noise=0;
-    for(let j=i-n+1;j<=i;j++) noise+=Math.abs(close[j]-close[j-1]);
-    const er=noise===0?0:dir/noise;
-    const sc=Math.pow(er*(fastSC-slowSC)+slowSC,2);
-    kama[i]=kama[i-1]+sc*(close[i]-kama[i-1]);
-  }
-  return kama;
-}
-function calcER(close,n=10){
-  if(close.length<n+1) return 0;
-  const dir=Math.abs(close[close.length-1]-close[close.length-1-n]);
-  let noise=0;
-  for(let i=close.length-n;i<close.length;i++) noise+=Math.abs(close[i]-close[i-1]);
-  return noise===0?0:dir/noise;
-}
-function calcRSI(close,n=14){
-  if(close.length<n+1) return null;
-  let gains=0,losses=0;
-  for(let i=close.length-n;i<close.length;i++){
-    const d=close[i]-close[i-1];
-    if(d>0) gains+=d; else losses-=d;
-  }
-  const ag=gains/n,al=losses/n;
-  return al===0?100:100-(100/(1+ag/al));
-}
-function calcAO(high,low){
-  const mid=high.map((h,i)=>(h+low[i])/2);
-  const sma5=sma(mid,5),sma34=sma(mid,34);
-  return sma5.map((v,i)=>v!==null&&sma34[i]!==null?v-sma34[i]:null);
-}
-function calcBaffetti(ao){
-  let b=0;
-  for(let i=ao.length-1;i>0;i--){
-    if(ao[i]!==null&&ao[i-1]!==null&&ao[i]>ao[i-1]) b++;
-    else break;
-  }
-  return b;
-}
-function calcBaffettiAO(ao){
-  // baffetti checking also below zero
-  let b=0;
-  for(let i=ao.length-1;i>0;i--){
-    if(ao[i]!==null&&ao[i-1]!==null&&ao[i]>ao[i-1]) b++;
-    else break;
-  }
-  return b;
-}
-function trendycator(close){
-  if(close.length<55) return 'GRIGIO';
-  const e21=emaArr(close,21),e55=emaArr(close,55);
-  const n=e21.length-1;
-  if(e21[n]>e55[n]&&e21[n]>e21[n-1]) return 'VERDE';
-  if(e21[n]<e55[n]&&e21[n]<e21[n-1]) return 'ROSSO';
-  return 'GRIGIO';
-}
-function calcVolRatio(volume){
-  if(volume.length<21) return 1;
-  const avg20=volume.slice(-21,-1).reduce((a,b)=>a+b,0)/20;
-  return avg20===0?1:volume[volume.length-1]/avg20;
-}
-function crossDays(close,kama){
-  for(let i=close.length-1;i>0;i--){
-    if(kama[i]!==null&&kama[i-1]!==null)
-      if(close[i]>kama[i]&&close[i-1]<=kama[i-1]) return close.length-1-i;
-  }
-  return 999;
-}
-function entryDate(close,kama,timestamps){
-  for(let i=close.length-1;i>0;i--){
-    if(kama[i]!==null&&kama[i-1]!==null)
-      if(close[i]>kama[i]&&close[i-1]<=kama[i-1]){
-        const d=new Date(timestamps[i]*1000);
-        return d.getDate().toString().padStart(2,'0')+'/'+(d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getFullYear();
-      }
-  }
-  return '—';
-}
-function calcATR(h,l,c,n=14){
-  if(c.length<n+1) return null;
-  const tr=c.map((_,i)=>{
-    if(i===0) return h[i]-l[i];
-    return Math.max(h[i]-l[i],Math.abs(h[i]-c[i-1]),Math.abs(l[i]-c[i-1]));
-  });
-  let atr=tr.slice(1,n+1).reduce((a,b)=>a+b,0)/n;
-  for(let i=n+1;i<tr.length;i++) atr=(atr*(n-1)+tr[i])/n;
-  return atr;
-}
-function calcHeikinAshi(o,h,l,c){
-  const haO=[],haH=[],haL=[],haC=[];
-  haO.push((o[0]+c[0])/2);
-  haC.push((o[0]+h[0]+l[0]+c[0])/4);
-  haH.push(Math.max(h[0],haO[0],haC[0]));
-  haL.push(Math.min(l[0],haO[0],haC[0]));
-  for(let i=1;i<c.length;i++){
-    const nc=(o[i]+h[i]+l[i]+c[i])/4;
-    const no=(haO[i-1]+haC[i-1])/2;
-    haO.push(no);haC.push(nc);
-    haH.push(Math.max(h[i],no,nc));
-    haL.push(Math.min(l[i],no,nc));
-  }
-  return{haO,haH,haL,haC};
-}
-
-// Mean Reversion check
-function checkMR(close,kama,er,rsi,ao){
-  const lc=close[close.length-1];
-  const lk=kama[kama.length-1];
-  const lao=ao[ao.length-1];
-  const lao1=ao[ao.length-2];
-  const nearKama=lk!=null&&Math.abs(lc-lk)/lk<0.03;
-  const aoUp=lao!=null&&lao1!=null&&lao>lao1;
-  return er<0.3&&(rsi||100)<30&&aoUp&&(nearKama||lc<(lk||lc));
-}
-
-// ═══════════════════════════════════════════════════════════════════
-//  ANALYZE SINGLE TICKER
-// ═══════════════════════════════════════════════════════════════════
+// ═══ ANALYZE ═══
 async function analyzeTicker(info){
   try{
     const src=document.getElementById('srcSelect').value;
-    let c,h,l,v,t,metaName='';
-    if(src==='stooq'){
-      const d=await fetchStooq(info.y);
-      c=d.closes;h=d.highs;l=d.lows;v=d.vols;t=d.timestamps;
-    } else {
-      const raw=await fetchYahoo(info.y);
-      metaName=raw.meta?.longName||raw.meta?.shortName||'';
-      const q=raw.indicators.quote[0];
-      const ts=raw.timestamp;
-      const closes=q.close,highs=q.high,lows=q.low,vols=q.volume;
-      c=[];h=[];l=[];v=[];t=[];
-      for(let i=0;i<ts.length;i++){
-        if(closes[i]!=null&&highs[i]!=null&&lows[i]!=null){
-          c.push(closes[i]);h.push(highs[i]);l.push(lows[i]);
-          v.push(vols[i]||0);t.push(ts[i]);
-        }
-      }
-    }
-    if(c.length<60) return{ticker:info.t,y:info.y,categoria:info.c,nome:metaName,error:'Dati insuff.'};
-
-    const kama=calcKAMA(c);
-    const ao=calcAO(h,l);
-    const baff=calcBaffettiAO(ao);
-    const er=calcER(c);
-    const trd=trendycator(c);
-    const rsi=calcRSI(c);
+    let c,h,l,v,t,nome='';
+    if(src==='stooq'){const d=await fetchStooq(info.y);c=d.closes;h=d.highs;l=d.lows;v=d.vols;t=d.timestamps;}
+    else{const raw=await fetchYahoo(info.y);nome=raw.meta?.longName||raw.meta?.shortName||'';const q=raw.indicators.quote[0];const ts=raw.timestamp;c=[];h=[];l=[];v=[];t=[];for(let i=0;i<ts.length;i++){if(q.close[i]!=null&&q.high[i]!=null&&q.low[i]!=null){c.push(q.close[i]);h.push(q.high[i]);l.push(q.low[i]);v.push(q.volume[i]||0);t.push(ts[i]);}}}
+    if(c.length<60)return{ticker:info.t,y:info.y,categoria:info.c,nome,error:'Dati insuff.'};
+    const kama=calcKAMA(c);const ao=calcAO(h,l);const baff=calcBaf(ao);const er=calcER(c);const trd=trendycator(c);const rsi=calcRSI(c);
     const mm20=sma(c,20),mm50=sma(c,50),mm200=sma(c,200);
-    const price=c[c.length-1];
-    const kNow=kama[kama.length-1];
-    const aoNow=ao[ao.length-1];
-    const aoNow1=ao[ao.length-2];
-    const aboveKama=kNow!=null&&price>kNow;
-    const pkPct=kNow?((price-kNow)/kNow*100):0;
-    const mm20Now=mm20[mm20.length-1];
-    const mm50Now=mm50[mm50.length-1];
-    const mmAlign=mm20Now&&mm50Now?price>mm20Now&&mm20Now>mm50Now:false;
-    const cross=crossDays(c,kama);
+    const price=c[c.length-1],kNow=kama[kama.length-1],aoNow=ao[ao.length-1];
+    const aboveKama=kNow!=null&&price>kNow,pkPct=kNow?((price-kNow)/kNow*100):0;
+    const mm20v=mm20[mm20.length-1],mm50v=mm50[mm50.length-1];
+    const mmAlign=mm20v&&mm50v?price>mm20v&&mm20v>mm50v:false;
+    const cross=function(){for(let i=c.length-1;i>0;i--){if(kama[i]!==null&&kama[i-1]!==null&&c[i]>kama[i]&&c[i-1]<=kama[i-1])return c.length-1-i;}return 999;}();
     const perfSett=c.length>=6?(price/c[c.length-6]-1)*100:0;
     const perfMese=c.length>=23?(price/c[c.length-23]-1)*100:0;
-    const volRatio=calcVolRatio(v);
-    const eDate=entryDate(c,kama,t);
-    const mr=checkMR(c,kama,er,rsi,ao);
-    const aoUp=aoNow!=null&&aoNow1!=null&&aoNow>aoNow1;
-
-    // SEGNALE
+    const volRatio=calcVolRatio(v);const eDate=entryDate(c,kama,t);const mr=checkMR(c,kama,er,rsi,ao);
     let tipo='';
-    if(trd==='VERDE'&&aboveKama&&er>=0.50&&baff>=3&&mmAlign) tipo='LONG';
-    else if(aboveKama&&baff>=3&&(trd==='VERDE'||trd==='GRIGIO')) tipo='EARLY';
-    else if(aboveKama&&baff>=1&&(trd==='VERDE'||trd==='GRIGIO')) tipo='WATCH';
-    else if(trd==='ROSSO'&&cross<=3&&baff>=3) tipo='ROSSO+';
-    else if(mr) tipo='MR';
-
-    // USCITA
+    if(trd==='VERDE'&&aboveKama&&er>=0.50&&baff>=3&&mmAlign)tipo='LONG';
+    else if(aboveKama&&baff>=3&&(trd==='VERDE'||trd==='GRIGIO'))tipo='EARLY';
+    else if(aboveKama&&baff>=1&&(trd==='VERDE'||trd==='GRIGIO'))tipo='WATCH';
+    else if(trd==='ROSSO'&&cross<=3&&baff>=3)tipo='ROSSO+';
+    else if(mr)tipo='MR';
     let uscita='';
-    if(!aboveKama&&trd==='ROSSO') uscita='STOP';
-    else if(!aboveKama) uscita='USCITA';
-    else if(aboveKama&&(aoNow<=0||trd==='GRIGIO')) uscita='ATTENZIONE';
-
-    // SCORE
-    let score=er*30+Math.min(baff,10)*5+Math.min(Math.abs(pkPct),5)*3
-      +Math.max(-10,Math.min(5,perfSett))*4
-      +Math.max(-20,Math.min(10,perfMese))*2
-      +(mmAlign?10:0)+(aoNow>0?5:0)
-      +(cross<=3?20:cross<=10?12:cross<=20?5:0);
-    if(trd==='ROSSO') score*=0.6;
-    score=Math.round(Math.max(0,Math.min(200,score)));
-
-    return{
-      ticker:info.t,y:info.y,categoria:info.c,nome:metaName,
-      price,kama:kNow,er:+er.toFixed(3),baff,trendycator:trd,
-      rsi:rsi?+rsi.toFixed(1):null,mm20:mm20Now,mm50:mm50Now,mmAlign,
-      aoPos:aoNow>0,aoUp,pkPct:+pkPct.toFixed(2),
-      perfSett:+perfSett.toFixed(2),perfMese:+perfMese.toFixed(2),
-      volRatio:+volRatio.toFixed(2),score,tipo,uscita,
-      entryDate:eDate,cross,mr,error:null
-    };
-  }catch(e){
-    return{ticker:info.t,y:info.y,categoria:info.c,nome:'',error:e.message,score:0,tipo:'',uscita:''};
-  }
+    if(!aboveKama&&trd==='ROSSO')uscita='STOP';
+    else if(!aboveKama)uscita='USCITA';
+    else if(aboveKama&&(aoNow<=0||trd==='GRIGIO'))uscita='ATTENZIONE';
+    let score=er*30+Math.min(baff,10)*5+Math.min(Math.abs(pkPct),5)*3+Math.max(-10,Math.min(5,perfSett))*4+Math.max(-20,Math.min(10,perfMese))*2+(mmAlign?10:0)+(aoNow>0?5:0)+(cross<=3?20:cross<=10?12:cross<=20?5:0);
+    if(trd==='ROSSO')score*=0.6;score=Math.round(Math.max(0,Math.min(200,score)));
+    return{ticker:info.t,y:info.y,categoria:info.c,nome,price,kama:kNow,er:+er.toFixed(3),baff,trendycator:trd,rsi:rsi?+rsi.toFixed(1):null,mm20:mm20v,mm50:mm50v,mmAlign,aoPos:aoNow>0,pkPct:+pkPct.toFixed(2),perfSett:+perfSett.toFixed(2),perfMese:+perfMese.toFixed(2),volRatio:+volRatio.toFixed(2),score,tipo,uscita,entryDate:eDate,cross,mr,error:null};
+  }catch(e){return{ticker:info.t,y:info.y,categoria:info.c,nome:'',error:e.message,score:0,tipo:'',uscita:''};}
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  SCAN
-// ═══════════════════════════════════════════════════════════════════
+// ═══ SCAN ═══
 async function startScan(){
   const btn=document.getElementById('btnRun');
-  if(btn.disabled) return;
+  if(btn.disabled)return;
   btn.disabled=true;btn.classList.add('running');btn.textContent='⏳ Analisi...';
   document.getElementById('progressWrap').style.display='block';
   document.getElementById('mainTable').style.display='none';
@@ -1229,69 +407,28 @@ async function startScan(){
   allResults=[];
   const src=document.getElementById('srcSelect').value;
   TICKERS=src==='stooq'?TICKERS_STOOQ:TICKERS_YAHOO;
-  const total=TICKERS.length;
-  let done=0,errors=0;
-
+  const total=TICKERS.length;let done=0,errors=0;
   for(let b=0;b<total;b+=BATCH){
     const batch=TICKERS.slice(b,b+BATCH);
     const results=await Promise.all(batch.map(t=>analyzeTicker(t)));
-    allResults.push(...results);
-    done+=batch.length;
-    errors+=results.filter(r=>r.error).length;
+    allResults.push(...results);done+=batch.length;errors+=results.filter(r=>r.error).length;
     const pct=Math.round(done/total*100);
     document.getElementById('progressBar').style.width=pct+'%';
     document.getElementById('progressTxt').textContent=done+'/'+total+' · '+errors+' errori · '+pct+'%';
     document.getElementById('progressTicker').textContent=batch[batch.length-1]?.ticker||'';
-    if(done%(BATCH*5)===0||done===total) renderTable();
-    if(b+BATCH<total) await new Promise(r=>setTimeout(r,DELAY));
+    if(done%(BATCH*5)===0||done===total)renderTable();
+    if(b+BATCH<total)await new Promise(r=>setTimeout(r,DELAY));
   }
-
-  // Retry helper
-  async function retryPass(passNum,batchSize,delayInit,delayBatch){
-    const failedIdx=allResults.map((r,i)=>r.error?i:-1).filter(i=>i>=0);
-    if(!failedIdx.length) return;
-    document.getElementById('progressBar').style.width='0%';
-    document.getElementById('progressTxt').textContent=
-      '🔄 Retry '+passNum+'/3 · '+failedIdx.length+' ticker · pausa '+Math.round(delayInit/1000)+'s...';
-    await new Promise(r=>setTimeout(r,delayInit));
-    let retryDone=0;
-    for(let b=0;b<failedIdx.length;b+=batchSize){
-      const bIdx=failedIdx.slice(b,b+batchSize);
-      const bInfo=bIdx.map(i=>TICKERS[i]);
-      const results=await Promise.all(bInfo.map(t=>analyzeTicker(t)));
-      results.forEach((r,j)=>{allResults[bIdx[j]]=r;});
-      retryDone+=bIdx.length;
-      const pct=Math.round(retryDone/failedIdx.length*100);
-      const still=allResults.filter(r=>r.error).length;
-      document.getElementById('progressBar').style.width=pct+'%';
-      document.getElementById('progressTxt').textContent=
-        '🔄 Retry '+passNum+'/3 · '+retryDone+'/'+failedIdx.length+' · ancora '+still+' errori';
-      document.getElementById('progressTicker').textContent=bInfo[bInfo.length-1]?.ticker||'';
-      if(b+batchSize<failedIdx.length) await new Promise(r=>setTimeout(r,delayBatch));
-    }
-  }
-
-  await retryPass(2,3,1500,800);
-  if(allResults.filter(r=>r.error).length>0){
-    await retryPass(3,1,2500,1200); // pass 3: uno alla volta
-  }
-
-  const ts=new Date();
-  const finalErrors=allResults.filter(r=>r.error).length;
-  const tsStr='Aggiornato: '+ts.toLocaleDateString('it-IT')+' '+ts.toLocaleTimeString('it-IT')+
-    ' ('+src.toUpperCase()+') · '+finalErrors+' errori';
+  const ts=new Date();const finalErrors=allResults.filter(r=>r.error).length;
+  const tsStr='Aggiornato: '+ts.toLocaleDateString('it-IT')+' '+ts.toLocaleTimeString('it-IT')+' ('+src.toUpperCase()+') · '+finalErrors+' errori';
   document.getElementById('tsText').textContent=tsStr;
-  document.getElementById('tsBar').style.display='flex';
   try{localStorage.setItem('raptor_one_'+src,JSON.stringify({ts:tsStr,data:allResults}));}catch(e){}
-
   updateStats();renderTable();
   btn.disabled=false;btn.classList.remove('running');btn.textContent='⚡ CALCOLA';
   document.getElementById('progressWrap').style.display='none';
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  STATS
-// ═══════════════════════════════════════════════════════════════════
+// ═══ STATS ═══
 function updateStats(){
   const ok=allResults.filter(r=>!r.error);
   document.getElementById('hTotal').textContent=allResults.length;
@@ -1302,638 +439,204 @@ function updateStats(){
   document.getElementById('hUscita').textContent=ok.filter(r=>r.uscita==='USCITA').length;
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  FILTER LOGIC
-// ═══════════════════════════════════════════════════════════════════
-function getSegnale(r){
-  if(r.tipo==='LONG') return 'LONG';
-  if(r.tipo==='EARLY') return 'EARLY';
-  if(r.tipo==='WATCH') return 'WATCH';
-  if(r.tipo==='ROSSO+') return 'ROSSO+';
-  if(r.tipo==='MR') return 'MR';
-  if(r.uscita==='STOP') return 'STOP';
-  if(r.uscita==='USCITA') return 'USCITA';
-  if(r.uscita==='ATTENZIONE') return 'ATTENZIONE';
-  return '';
-}
-
+// ═══ FILTERS ═══
+function getSegnale(r){if(r.tipo==='LONG')return'LONG';if(r.tipo==='EARLY')return'EARLY';if(r.tipo==='WATCH')return'WATCH';if(r.tipo==='ROSSO+')return'ROSSO+';if(r.tipo==='MR')return'MR';if(r.uscita==='STOP')return'STOP';if(r.uscita==='USCITA')return'USCITA';if(r.uscita==='ATTENZIONE')return'ATTENZIONE';return'';}
 function applyFilters(data){
   let res=[...data].filter(r=>!r.error);
-
-  // category
-  if(activeCat!=='ALL'){
-    res=res.filter(r=>{
-      const c=r.categoria||'';
-      if(activeCat==='ADVICE') return c.includes('ADVICE')||c.includes('Advice');
-      if(activeCat==='ATTIVO') return c.includes('ATTIVO');
-      if(activeCat==='SPDR USA') return c.includes('SPDR USA');
-      if(activeCat==='SPDR EURO') return c.includes('SPDR EURO');
-      if(activeCat==='SPDR WORLD') return c.includes('SPDR WORLD');
-      if(activeCat==='NEW AREA') return c.includes('NEW AREA');
-      if(activeCat==='Dividend') return c.toLowerCase().includes('dividend');
-      if(activeCat==='Lazy') return c.includes('Lazy')||c.includes('lazy');
-      return c.includes(activeCat);
-    });
-  }
-
-  // combo filter overrides sig filter
+  if(activeCat!=='ALL')res=res.filter(r=>(r.categoria||'').includes(activeCat));
   if(activeCombo){
     switch(activeCombo){
-      case 'FRESCHI':
-        res=res.filter(r=>r.cross<=5&&r.er>=0.5&&r.baff>=3); break;
-      case 'LONGPURI':
-        res=res.filter(r=>r.tipo==='LONG'&&r.aoPos&&r.baff>=3); break;
-      case 'EARLY_P':
-        res=res.filter(r=>r.tipo==='EARLY'&&r.er>=0.5&&r.trendycator==='VERDE'); break;
-      case 'PRESSIONE':
-        res=res.filter(r=>r.tipo==='WATCH'&&!r.aoPos); break;
-      case 'PREUSCITA':
-        res=res.filter(r=>r.uscita==='ATTENZIONE'&&r.trendycator==='ROSSO'); break;
-      case 'STOPKAMA':
-        // prezzo ha tagliato KAMA nell'ultima seduta
-        res=res.filter(r=>r.uscita==='USCITA'||r.uscita==='STOP'); break;
-      case 'ESPLOSIVI':
-        res=res.filter(r=>r.volRatio>=2&&r.er>=0.6&&r.baff>=3); break;
-      case 'TOP10':
-        res=res.filter(r=>r.tipo&&r.tipo!=='ROSSO+');
-        res.sort((a,b)=>b.score-a.score);
-        res=res.slice(0,10); break;
+      case'FRESCHI':res=res.filter(r=>r.cross<=5&&r.er>=0.5&&r.baff>=3);break;
+      case'LONGPURI':res=res.filter(r=>r.tipo==='LONG'&&r.aoPos&&r.baff>=3);break;
+      case'EARLY_P':res=res.filter(r=>r.tipo==='EARLY'&&r.er>=0.5&&r.trendycator==='VERDE');break;
+      case'PRESSIONE':res=res.filter(r=>r.tipo==='WATCH'&&!r.aoPos);break;
+      case'PREUSCITA':res=res.filter(r=>r.uscita==='ATTENZIONE'&&r.trendycator==='ROSSO');break;
+      case'STOPKAMA':res=res.filter(r=>r.uscita==='USCITA'||r.uscita==='STOP');break;
+      case'ESPLOSIVI':res=res.filter(r=>r.volRatio>=2&&r.er>=0.6&&r.baff>=3);break;
+      case'TOP10':res=res.filter(r=>r.tipo&&r.tipo!=='ROSSO+');res.sort((a,b)=>b.score-a.score);res=res.slice(0,10);break;
     }
     return res;
   }
-
-  // signal filter
-  if(activeSig!=='ALL'){
-    res=res.filter(r=>getSegnale(r)===activeSig);
-  }
-
+  if(activeSig!=='ALL')res=res.filter(r=>getSegnale(r)===activeSig);
   return res;
 }
+function setSig(sig,btn){activeSig=sig;activeCombo=null;document.querySelectorAll('.btn-sig').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.btn-combo').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTable();}
+function setCombo(combo,btn){activeCombo=activeCombo===combo?null:combo;activeSig='ALL';document.querySelectorAll('.btn-combo').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.btn-sig').forEach(b=>b.classList.remove('active'));document.querySelector('.btn-sig[data-sig="ALL"]').classList.add('active');if(activeCombo)btn.classList.add('active');renderTable();}
+function setCat(cat,btn){activeCat=cat;document.querySelectorAll('.btn-cat').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('catActiveLabel').textContent=cat==='ALL'?'':'▸ '+cat;renderTable();}
+function toggleCat(){const row=document.getElementById('catRow');const btn=document.getElementById('btnToggleCat');row.classList.contains('open')?(row.classList.remove('open'),btn.textContent='▼ Categorie'):(row.classList.add('open'),btn.textContent='▲ Categorie');}
 
-function setSig(sig,btn){
-  activeSig=sig; activeCombo=null;
-  document.querySelectorAll('.btn-sig').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.btn-combo').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderTable();
-}
-function setCombo(combo,btn){
-  activeCombo=activeCombo===combo?null:combo;
-  activeSig='ALL';
-  document.querySelectorAll('.btn-combo').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.btn-sig').forEach(b=>b.classList.remove('active'));
-  document.querySelector('.btn-sig[data-sig="ALL"]').classList.add('active');
-  if(activeCombo) btn.classList.add('active');
-  renderTable();
-}
-function setCat(cat,btn){
-  activeCat=cat;
-  document.querySelectorAll('.btn-cat').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('catActiveLabel').textContent=cat==='ALL'?'':'▸ '+cat;
-  renderTable();
-}
-function toggleCat(){
-  const row=document.getElementById('catRow');
-  const btn=document.getElementById('btnToggleCat');
-  if(row.classList.contains('open')){
-    row.classList.remove('open');btn.textContent='▼ Categorie';
-  } else {
-    row.classList.add('open');btn.textContent='▲ Categorie';
-  }
-}
+// ═══ SORT ═══
+function sortBy(field){if(sortField===field)sortDir*=-1;else{sortField=field;sortDir=-1;}document.querySelectorAll('th').forEach(th=>{th.classList.remove('sort-asc','sort-desc');});const fields=['ticker','nome','categoria','segnale','score','trendycator','price','er','baff','pkPct','aoPos','rsi','perfSett','perfMese','volRatio','mmAlign','cross','entryDate'];const idx=fields.indexOf(field);if(idx>=0)document.querySelectorAll('th')[idx].classList.add(sortDir>0?'sort-asc':'sort-desc');renderTable();}
 
-// ═══════════════════════════════════════════════════════════════════
-//  SORT
-// ═══════════════════════════════════════════════════════════════════
-function sortBy(field){
-  if(sortField===field) sortDir*=-1;
-  else{sortField=field;sortDir=-1;}
-  document.querySelectorAll('th').forEach(th=>{th.classList.remove('sort-asc','sort-desc');});
-  const ths=document.querySelectorAll('th');
-  const fieldMap={'ticker':0,'nome':1,'categoria':2,'segnale':3,'score':4,'trendycator':5,
-    'price':6,'er':7,'baff':8,'pkPct':9,'aoPos':10,'rsi':11,'perfSett':12,'perfMese':13,
-    'volRatio':14,'mmAlign':15,'cross':16,'entryDate':17};
-  const idx=fieldMap[field];
-  if(idx!==undefined) ths[idx].classList.add(sortDir>0?'sort-asc':'sort-desc');
-  renderTable();
-}
-
-// ═══════════════════════════════════════════════════════════════════
-//  RENDER TABLE
-// ═══════════════════════════════════════════════════════════════════
-function f2(v){return v!=null?v.toFixed(2):'—';}
-function f3(v){return v!=null?v.toFixed(3):'—';}
-function fp(v){return v!=null?(v>=0?'+':'')+v.toFixed(2)+'%':'—';}
-
-function sigBadge(r){
-  const s=getSegnale(r);
-  if(!s) return '<span class="sig sig-empty">—</span>';
-  const map={
-    'LONG':'🟢 LONG','EARLY':'🔵 EARLY','WATCH':'🟡 WATCH',
-    'ROSSO+':'⚪ ROSSO+','MR':'🟠 MR','STOP':'⛔ STOP',
-    'USCITA':'🔴 USCITA','ATTENZIONE':'⚠️ ATTENZ'
-  };
-  const cls={'LONG':'LONG','EARLY':'EARLY','WATCH':'WATCH','ROSSO+':'ROSSO',
-    'MR':'MR','STOP':'STOP','USCITA':'USCITA','ATTENZIONE':'ATTENZIONE'};
-  return `<span class="sig sig-${cls[s]||'empty'}">${map[s]||s}</span>`;
-}
+// ═══ RENDER TABLE ═══
+function sigBadge(r){const s=getSegnale(r);if(!s)return'<span class="sig sig-empty">—</span>';const map={LONG:'🟢 LONG',EARLY:'🔵 EARLY',WATCH:'🟡 WATCH','ROSSO+':'⚪ ROSSO+',MR:'🟠 MR',STOP:'⛔ STOP',USCITA:'🔴 USCITA',ATTENZIONE:'⚠️ ATTENZ'};const cls={LONG:'LONG',EARLY:'EARLY',WATCH:'WATCH','ROSSO+':'ROSSO',MR:'MR',STOP:'STOP',USCITA:'USCITA',ATTENZIONE:'ATTENZIONE'};return`<span class="sig sig-${cls[s]||'empty'}">${map[s]||s}</span>`;}
 
 function renderTable(){
-  if(!allResults.length){
-    document.getElementById('mainTable').style.display='none';
-    document.getElementById('emptyState').style.display='block';
-    return;
-  }
-
+  if(!allResults.length){document.getElementById('mainTable').style.display='none';document.getElementById('emptyState').style.display='block';return;}
   let data=applyFilters(allResults);
-
-  // sort
-  data.sort((a,b)=>{
-    let va=a[sortField],vb=b[sortField];
-    if(sortField==='segnale'){va=getSegnale(a)||'';vb=getSegnale(b)||'';}
-    if(sortField==='trendycator'){
-      const o={'VERDE':2,'GRIGIO':1,'ROSSO':0};
-      va=o[a.trendycator||'']??0;vb=o[b.trendycator||'']??0;
-    }
-    if(va==null&&vb==null) return 0;
-    if(va==null) return 1;if(vb==null) return -1;
-    if(typeof va==='string') return sortDir*(va.localeCompare(vb));
-    return sortDir*(va-vb);
-  });
-
+  data.sort((a,b)=>{let va=a[sortField],vb=b[sortField];if(sortField==='segnale'){va=getSegnale(a)||'';vb=getSegnale(b)||'';}if(sortField==='trendycator'){const o={VERDE:2,GRIGIO:1,ROSSO:0};va=o[a.trendycator||'']??0;vb=o[b.trendycator||'']??0;}if(va==null&&vb==null)return 0;if(va==null)return 1;if(vb==null)return-1;if(typeof va==='string')return sortDir*(va.localeCompare(vb));return sortDir*(va-vb);});
   filteredResults=data;
-  const tbody=document.getElementById('tableBody');
   const src=document.getElementById('srcSelect').value;
-  const rows=data.map(r=>{
-    const new_=r.cross<=5&&(r.tipo==='LONG'||r.tipo==='EARLY')?
-      '<span class="new-badge">NEW</span>':'';
+  const tbody=document.getElementById('tableBody');
+  tbody.innerHTML=data.map(r=>{
+    const new_=r.cross<=5&&(r.tipo==='LONG'||r.tipo==='EARLY')?'<span class="new-badge">NEW</span>':'';
     const trCls=r.trendycator==='VERDE'?'trend-V':r.trendycator==='ROSSO'?'trend-R':'trend-G';
-    const trLbl={'VERDE':'▲ VERDE','ROSSO':'▼ ROSSO','GRIGIO':'● GRIGIO'}[r.trendycator||'']||'—';
-    const s8=fp(r.perfSett),m8=fp(r.perfMese);
+    const trLbl={VERDE:'▲ VERDE',ROSSO:'▼ ROSSO',GRIGIO:'● GRIGIO'}[r.trendycator||'']||'—';
     const sC=r.perfSett>=0?'pos':'neg',mC=r.perfMese>=0?'pos':'neg';
     const vol=r.volRatio!=null?r.volRatio.toFixed(1):'—';
     const volC=r.volRatio>=2?'pos':r.volRatio<0.7?'neg':'';
     const aCls=r.aoPos?'pos':'neg',aLbl=r.aoPos?'▲ +':'▼ −';
-    const mmLbl=r.mmAlign?'✅':'—';
     const catShort=(r.categoria||'').split(' ')[0].substring(0,7);
-    return `<tr>
-      <td><strong>${r.ticker}</strong>${new_}</td>
-      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis" title="${r.nome||r.ticker}">${r.nome||'—'}</td>
-      <td style="font-size:10px;color:var(--text2)">${catShort}</td>
-      <td>${sigBadge(r)}</td>
-      <td><strong>${r.score||0}</strong></td>
-      <td class="${trCls}">${trLbl}</td>
-      <td>${r.price!=null?r.price.toFixed(3):'—'}</td>
-      <td>${r.er!=null?(r.er*100).toFixed(0)+'%':'—'}</td>
-      <td>${r.baff||0}</td>
-      <td class="${r.pkPct>=0?'pos':'neg'}">${f2(r.pkPct)}%</td>
-      <td class="${aCls}">${aLbl}</td>
-      <td>${r.rsi!=null?r.rsi.toFixed(1):'—'}</td>
-      <td class="${sC}">${s8}</td>
-      <td class="${mC}">${m8}</td>
-      <td class="${volC}">${vol}x</td>
-      <td>${mmLbl}</td>
-      <td>${r.cross<999?r.cross:'—'}</td>
-      <td style="font-size:11px">${r.entryDate||'—'}</td>
-      <td><button class="btn-chart" onclick="openChart('${r.y}','${encodeURIComponent(r.nome||r.ticker)}','${src}')">📈</button></td>
-    </tr>`;
-  }).join('');
-
-  tbody.innerHTML=rows||'<tr><td colspan="19" style="text-align:center;padding:40px;color:var(--text2)">Nessun risultato con i filtri selezionati</td></tr>';
+    return`<tr><td><strong>${r.ticker}</strong>${new_}</td><td style="max-width:140px;overflow:hidden;text-overflow:ellipsis" title="${r.nome||r.ticker}">${r.nome||'—'}</td><td style="font-size:10px;color:var(--text2)">${catShort}</td><td>${sigBadge(r)}</td><td><strong>${r.score||0}</strong></td><td class="${trCls}">${trLbl}</td><td>${r.price!=null?r.price.toFixed(3):'—'}</td><td>${r.er!=null?(r.er*100).toFixed(0)+'%':'—'}</td><td>${r.baff||0}</td><td class="${r.pkPct>=0?'pos':'neg'}">${r.pkPct!=null?r.pkPct.toFixed(2):'—'}%</td><td class="${aCls}">${aLbl}</td><td>${r.rsi!=null?r.rsi.toFixed(1):'—'}</td><td class="${sC}">${r.perfSett>=0?'+':''}${r.perfSett!=null?r.perfSett.toFixed(2):'—'}%</td><td class="${mC}">${r.perfMese>=0?'+':''}${r.perfMese!=null?r.perfMese.toFixed(2):'—'}%</td><td class="${volC}">${vol}x</td><td>${r.mmAlign?'✅':'—'}</td><td>${r.cross<999?r.cross:'—'}</td><td style="font-size:11px">${r.entryDate||'—'}</td><td><button class="btn-chart" onclick="openChartInline('${r.y}','${encodeURIComponent(r.nome||r.ticker)}','${src}')">📈</button></td></tr>`;
+  }).join('')||'<tr><td colspan="19" style="text-align:center;padding:40px;color:var(--text2)">Nessun risultato</td></tr>';
   document.getElementById('mainTable').style.display='';
   document.getElementById('emptyState').style.display='none';
 }
 
-function openChart(symbol,name,src){
-  const url=`RAPTOR_Advanced.html?ticker=${encodeURIComponent(symbol)}`;
-  window.open(url,'_blank');
-}
-
-// ═══════════════════════════════════════════════════════════════════
-//  SMART REFRESH
-// ═══════════════════════════════════════════════════════════════════
-function toggleSmart(){
-  smartOn=!smartOn;
-  const btn=document.getElementById('smartToggle');
-  if(smartOn){
-    btn.textContent='🔄 Smart Refresh ON';btn.classList.add('active');
-    scheduleNext();
-  } else {
-    btn.textContent='🔄 Smart Refresh OFF';btn.classList.remove('active');
-    if(smartTimer) clearTimeout(smartTimer);
-    if(smartCountdown) clearInterval(smartCountdown);
-    document.getElementById('countdown').textContent='';
-  }
-}
-
-function scheduleNext(){
-  if(!smartOn) return;
-  const now=new Date();
-  const h=now.getHours(),m=now.getMinutes();
-  // Se siamo fuori mercato (dopo 17:30 o prima delle 9) aspetta fino a 9:00
-  const mkt=h>=9&&h<17||(h===17&&m<30);
-  let delayMs=mkt?60*60*1000:msToNext9();// in mercato: 1h; fuori: aspetta 9:00
-  startCountdown(delayMs);
-  smartTimer=setTimeout(()=>{
-    if(smartOn) startScan().then(()=>scheduleNext());
-  },delayMs);
-}
-
-function msToNext9(){
-  const now=new Date();
-  const next=new Date(now);
-  next.setHours(9,0,0,0);
-  if(now>=next) next.setDate(next.getDate()+1);
-  return next-now;
-}
-
-function startCountdown(ms){
-  if(smartCountdown) clearInterval(smartCountdown);
-  let rem=Math.floor(ms/1000);
-  function tick(){
-    if(!smartOn){document.getElementById('countdown').textContent='';return;}
-    const h=Math.floor(rem/3600),m=Math.floor((rem%3600)/60),s=rem%60;
-    document.getElementById('countdown').textContent=
-      '⏱ prossimo: '+(h?h+'h ':'')+m.toString().padStart(2,'0')+'m '+s.toString().padStart(2,'0')+'s';
-    if(rem>0) rem--; else clearInterval(smartCountdown);
-  }
-  tick();
-  smartCountdown=setInterval(tick,1000);
-}
-
-// ═══════════════════════════════════════════════════════════════════
-//  EXPORT EXCEL
-// ═══════════════════════════════════════════════════════════════════
-function exportExcel(){
-  const data=filteredResults.length?filteredResults:allResults.filter(r=>!r.error);
-  if(!data.length){alert('Nessun dato da esportare');return;}
-  const ws_data=[['Ticker','Nome','Categoria','Segnale','Score','Trendycator','Prezzo','ER%',
-    'Baffetti','K%','AO','RSI','Sett%','Mese%','VOL x','MM Align','GG Ingresso','Data Ingresso']];
-  data.forEach(r=>{
-    ws_data.push([
-      r.ticker,r.nome||'',r.categoria||'',getSegnale(r),r.score||0,r.trendycator||'',
-      r.price||0,(r.er*100)||0,r.baff||0,r.pkPct||0,r.aoPos?'+':'-',
-      r.rsi||0,r.perfSett||0,r.perfMese||0,r.volRatio||0,r.mmAlign?'Sì':'No',
-      r.cross<999?r.cross:'',r.entryDate||''
-    ]);
-  });
-  const wb=XLSX.utils.book_new();
-  const ws=XLSX.utils.aoa_to_sheet(ws_data);
-  ws['!cols']=[{wch:8},{wch:24},{wch:12},{wch:12},{wch:7},{wch:10},{wch:9},{wch:7},
-    {wch:7},{wch:7},{wch:5},{wch:6},{wch:7},{wch:7},{wch:6},{wch:9},{wch:10},{wch:12}];
-  XLSX.utils.book_append_sheet(wb,ws,'RAPTOR One');
-  const dt=new Date().toISOString().slice(0,10);
-  XLSX.writeFile(wb,`RAPTOR_One_${dt}.xlsx`);
-}
-
-
-// ═══════════════════════════════════════════════════════════════════
-//  CHART MODE
-// ═══════════════════════════════════════════════════════════════════
-const CHART_JSON='https://raw.githubusercontent.com/Giorgiogoldoni/fixed/main/raptor_chart.json';
-let chartInstances={};
-let currentChartData=null;
-let currentTF='1m';
-let currentSym='',currentSrc='yahoo';
-let chartJsonCache=null;
-
-function openSpecs(){ document.getElementById('specsModal').style.display='block'; document.body.style.overflow='hidden'; }
-function closeSpecs(){ document.getElementById('specsModal').style.display='none'; document.body.style.overflow=''; }
-
-async function getChartJson(){
-  if(chartJsonCache) return chartJsonCache;
-  const res=await fetch(CHART_JSON,{cache:'no-store'});
-  if(!res.ok) throw new Error('JSON HTTP '+res.status);
-  chartJsonCache=await res.json();
-  return chartJsonCache;
-}
-
-// TF → {useHourly, nDays, nHours}
-function tfParams(tf){
-  if(tf==='5h')  return {hourly:true, n:5};
-  if(tf==='1d')  return {hourly:true, n:40};
-  if(tf==='1w')  return {hourly:false, n:5};
-  if(tf==='1m')  return {hourly:false, n:21};
-  if(tf==='3m')  return {hourly:false, n:63};
-  if(tf==='6m')  return {hourly:false, n:126};
-  return              {hourly:false, n:252}; // 1y
-}
-
-async function initChartMode(sym,name,src){
-  currentSym=sym; currentSrc=src;
+// ═══ CHART ═══
+function openChartInline(sym,name,src){
+  currentSym=sym;currentSrc=src;
   const decodedName=decodeURIComponent(name);
   document.getElementById('chartTitle').textContent=sym+(decodedName?' — '+decodedName:'');
-  document.getElementById('chartSub').textContent='Fonte: '+( src==='stooq'?'STOOQ':'Yahoo Finance')+' · dati da raptor_chart.json';
+  document.getElementById('chartSub').textContent='Fonte: raptor_chart.json';
+  document.getElementById('tableMode').style.display='none';
+  document.getElementById('chartMode').style.display='block';
   document.getElementById('loadOverlay').style.display='flex';
   document.getElementById('loadMsg').textContent='Caricamento dati...';
-  // default active btn = 1m
   document.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));
-  const defBtn=document.querySelector('.tf-btn[data-tf="1m"]');
-  if(defBtn) defBtn.classList.add('active');
+  document.querySelector('.tf-btn[data-tf="1m"]').classList.add('active');
   currentTF='1m';
-  await loadChartData(sym,src,currentTF);
+  loadChartData(sym,src,'1m');
 }
-
-async function setTF(btn){
-  if(btn.id==='btnSpecs') return;
+function backToTable(){
+  document.getElementById('chartMode').style.display='none';
+  document.getElementById('tableMode').style.display='block';
+  Object.values(chartInstances).forEach(c=>{try{c.destroy();}catch(e){}});
+  chartInstances={};
+}
+function setTF(btn){
   document.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  currentTF=btn.dataset.tf;
+  btn.classList.add('active');currentTF=btn.dataset.tf;
   document.getElementById('loadOverlay').style.display='flex';
-  document.getElementById('loadMsg').textContent='Caricamento dati...';
-  await loadChartData(currentSym,currentSrc,currentTF);
+  document.getElementById('loadMsg').textContent='Caricamento...';
+  loadChartData(currentSym,currentSrc,currentTF);
 }
+function tfParams(tf){
+  if(tf==='5h')return{hourly:true,n:5};if(tf==='1d')return{hourly:true,n:40};
+  if(tf==='1w')return{hourly:false,n:5};if(tf==='1m')return{hourly:false,n:21};
+  if(tf==='3m')return{hourly:false,n:63};if(tf==='6m')return{hourly:false,n:126};
+  return{hourly:false,n:252};
+}
+async function getChartJson(){if(chartJsonCache)return chartJsonCache;const res=await fetch(CHART_JSON+'?t='+Date.now());if(!res.ok)throw new Error('HTTP '+res.status);chartJsonCache=await res.json();return chartJsonCache;}
 
 async function loadChartData(sym,src,tf){
   try{
-    const p=tfParams(tf);
-    let bars=[];
-
-    // Try raptor_chart.json first
-    try{
-      const j=await getChartJson();
-      // match by yahoo symbol — find entry where key == sym (case-insensitive)
-      const key=Object.keys(j.data||{}).find(k=>k.toLowerCase()===sym.toLowerCase());
-      if(key){
-        const raw=p.hourly ? j.data[key].h : j.data[key].d;
-        bars=(raw||[]).slice(-(p.n));
-      }
-    }catch(e){ console.warn('chart JSON error:',e); }
-
+    const p=tfParams(tf);let bars=[];
+    try{const j=await getChartJson();const key=Object.keys(j.data||{}).find(k=>k.toLowerCase()===sym.toLowerCase());if(key){const raw=p.hourly?j.data[key].h:j.data[key].d;bars=(raw||[]).slice(-p.n);}}catch(e){console.warn('chart JSON:',e);}
     let c=[],h=[],l=[],v=[],t=[];
-    if(bars.length>=10){
-      bars.forEach(b=>{ t.push(b[0]);c.push(b[4]);h.push(b[2]);l.push(b[3]);v.push(b[5]||0); });
-      // fix open not saved — use prev close
-      document.getElementById('chartSub').textContent='Fonte: raptor_chart.json · '+new Date().toLocaleDateString('it-IT');
-    } else {
-      // Fallback: live fetch (may fail on GitHub Pages)
-      document.getElementById('loadMsg').textContent='JSON non disponibile, tentativo live...';
-      if(src==='stooq'){
-        const d=await fetchStooq(sym);
-        c=d.closes.slice(-p.n);h=d.highs.slice(-p.n);
-        l=d.lows.slice(-p.n);v=d.vols.slice(-p.n);t=d.timestamps.slice(-p.n);
-      } else {
-        const yInt=p.hourly?'1h':'1d';
-        const yRange=p.hourly?'5d':tf==='1w'?'1mo':tf==='1m'?'3mo':tf==='3m'?'6mo':tf==='6m'?'1y':'2y';
-        const raw=await fetchYahoo(sym,yInt,yRange);
-        const q=raw.indicators.quote[0];
-        const ts=raw.timestamp;
-        for(let i=0;i<ts.length;i++){
-          if(q.close[i]!=null&&q.high[i]!=null&&q.low[i]!=null){
-            c.push(q.close[i]);h.push(q.high[i]);l.push(q.low[i]);
-            v.push(q.volume[i]||0);t.push(ts[i]);
-          }
-        }
-        c=c.slice(-p.n);h=h.slice(-p.n);l=l.slice(-p.n);v=v.slice(-p.n);t=t.slice(-p.n);
-      }
+    if(bars.length>=10){bars.forEach(b=>{t.push(b[0]);c.push(b[4]);h.push(b[2]);l.push(b[3]);v.push(b[5]||0);});document.getElementById('chartSub').textContent='raptor_chart.json · '+new Date().toLocaleDateString('it-IT');}
+    else{
+      document.getElementById('loadMsg').textContent='JSON vuoto, tentativo live...';
+      if(src==='stooq'){const d=await fetchStooq(sym);c=d.closes.slice(-p.n);h=d.highs.slice(-p.n);l=d.lows.slice(-p.n);v=d.vols.slice(-p.n);t=d.timestamps.slice(-p.n);}
+      else{const yInt=p.hourly?'1h':'1d';const yRange=p.hourly?'5d':tf==='1w'?'1mo':tf==='1m'?'3mo':tf==='3m'?'6mo':tf==='6m'?'1y':'2y';const raw=await fetchYahoo(sym,yInt,yRange);const q=raw.indicators.quote[0];const ts=raw.timestamp;for(let i=0;i<ts.length;i++){if(q.close[i]!=null&&q.high[i]!=null&&q.low[i]!=null){c.push(q.close[i]);h.push(q.high[i]);l.push(q.low[i]);v.push(q.volume[i]||0);t.push(ts[i]);}}c=c.slice(-p.n);h=h.slice(-p.n);l=l.slice(-p.n);v=v.slice(-p.n);t=t.slice(-p.n);}
     }
-
-    if(!c.length) throw new Error('Nessun dato disponibile per questo ticker');
-    currentChartData={c,h,l,v,t,tf};
+    if(!c.length)throw new Error('Nessun dato disponibile');
     document.getElementById('loadOverlay').style.display='none';
-    // Delay rendering so DOM is fully laid out before Chart.js measures containers
-    setTimeout(()=>{
-      renderAllPanels(c,h,l,v,t,tf);
-      updateInfoBar(c,h,l,v);
-    },50);
-  } catch(e){
-    document.getElementById('loadMsg').textContent='Errore: '+e.message;
-  }
+    setTimeout(()=>{renderCharts(c,h,l,v,t,tf);updateInfoBar(c,h,l,v);},50);
+  }catch(e){document.getElementById('loadMsg').textContent='Errore: '+e.message;}
 }
 
-function fmtLabel(ts,tf){
-  const d=new Date(ts*1000);
-  if(tf==='5h'||tf==='1d') return d.getHours()+':'+(d.getMinutes().toString().padStart(2,'0'));
-  if(tf==='1w'||tf==='1m') return d.getDate()+'/'+(d.getMonth()+1);
-  return d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear().toString().slice(2);
-}
+function fmtLabel(ts,tf){const d=new Date(ts*1000);if(tf==='5h'||tf==='1d')return d.getHours()+':'+(d.getMinutes().toString().padStart(2,'0'));if(tf==='1w'||tf==='1m')return d.getDate()+'/'+(d.getMonth()+1);return d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear().toString().slice(2);}
+function dc(id){if(chartInstances[id]){chartInstances[id].destroy();delete chartInstances[id];}}
+function chartOpts(n){return{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,backgroundColor:'rgba(255,255,255,0.97)',titleColor:'#1f2328',bodyColor:'#57606a',borderColor:'#d0d7de',borderWidth:1}},scales:{x:{display:n<=120,ticks:{color:'#57606a',font:{size:10},maxTicksLimit:10},grid:{color:'rgba(208,215,222,.4)'}},y:{grid:{color:'rgba(208,215,222,.4)'},ticks:{color:'#57606a',font:{size:10}}}},animation:{duration:0},interaction:{mode:'index',intersect:false}};}
 
-function destroyChart(id){
-  if(chartInstances[id]){chartInstances[id].destroy();delete chartInstances[id];}
-}
-
-function renderAllPanels(c,h,l,v,t,tf){
+function renderCharts(c,h,l,v,t,tf){
   const labels=t.map(ts=>fmtLabel(ts,tf));
-  const kama=calcKAMA(c);
-  const ao=calcAO(h,l);
+  const kama=calcKAMA(c);const ao=calcAO(h,l);
   const rsiArr=c.map((_,i)=>calcRSI(c.slice(0,i+1)));
   const mm20=sma(c,20),mm50=sma(c,50),mm200=sma(c,200);
-  const {haO,haH,haL,haC}=calcHeikinAshi(h.map((_,i)=>i===0?c[0]:c[i]),h,l,c);
-  const volColors=c.map((x,i)=>i===0?'rgba(9,105,218,0.4)':c[i]>=c[i-1]?'rgba(26,127,55,0.5)':'rgba(207,34,46,0.5)');
+  const {haO,haH,haL,haC}=calcHA(h.map((_,i)=>i===0?c[0]:c[i]),h,l,c);
+  const volC=c.map((x,i)=>i===0?'rgba(9,105,218,0.4)':c[i]>=c[i-1]?'rgba(26,127,55,0.5)':'rgba(207,34,46,0.5)');
 
-  // ── P1: Price + KAMA + MMs ─────────────────────────────────────
-  destroyChart('p1');
-  chartInstances.p1=new Chart(document.getElementById('p1').getContext('2d'),{
-    type:'line',
-    data:{labels,datasets:[
-      {label:'Prezzo',data:c,borderColor:'#1f2328',borderWidth:1.5,pointRadius:0,fill:false,tension:0},
-      {label:'KAMA', data:kama,borderColor:'#f0883e',borderWidth:2,pointRadius:0,fill:false,tension:0,spanGaps:true},
-      {label:'MM20', data:mm20,borderColor:'#58a6ff',borderWidth:1,pointRadius:0,fill:false,tension:0,spanGaps:true,borderDash:[3,3]},
-      {label:'MM50', data:mm50,borderColor:'#e3b341',borderWidth:1,pointRadius:0,fill:false,tension:0,spanGaps:true,borderDash:[5,3]},
-      {label:'MM200',data:mm200,borderColor:'#bc8cff',borderWidth:1,pointRadius:0,fill:false,tension:0,spanGaps:true,borderDash:[8,4]},
-    ]},
-    options:chartOpts('P1',labels.length)
-  });
+  dc('p1');chartInstances.p1=new Chart(document.getElementById('p1').getContext('2d'),{type:'line',data:{labels,datasets:[{label:'Prezzo',data:c,borderColor:'#1f2328',borderWidth:1.5,pointRadius:0,fill:false,tension:0},{label:'KAMA',data:kama,borderColor:'#f0883e',borderWidth:2,pointRadius:0,fill:false,tension:0,spanGaps:true},{label:'MM20',data:mm20,borderColor:'#58a6ff',borderWidth:1,pointRadius:0,fill:false,tension:0,spanGaps:true,borderDash:[3,3]},{label:'MM50',data:mm50,borderColor:'#e3b341',borderWidth:1,pointRadius:0,fill:false,tension:0,spanGaps:true,borderDash:[5,3]},{label:'MM200',data:mm200,borderColor:'#bc8cff',borderWidth:1,pointRadius:0,fill:false,tension:0,spanGaps:true,borderDash:[8,4]}]},options:{...chartOpts(labels.length),plugins:{legend:{display:true,labels:{font:{size:10},boxWidth:14}}}}});
 
-  // ── P2: Heikin-Ashi ─────────────────────────────────────────────
-  destroyChart('p2');
-  const haMin=Math.min(...haC)*0.995;
-  chartInstances.p2=new Chart(document.getElementById('p2').getContext('2d'),{
-    type:'bar',
-    data:{labels,datasets:[{
-      label:'HA Close',
-      data:haC,
-      backgroundColor:haC.map((v,i)=>v>=haO[i]?'rgba(26,127,55,0.80)':'rgba(207,34,46,0.80)'),
-      borderColor:haC.map((v,i)=>v>=haO[i]?'#1a7f37':'#cf222e'),
-      borderWidth:1,
-      barPercentage:0.9,categoryPercentage:1.0
-    }]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      animation:{duration:0},
-      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,backgroundColor:'rgba(255,255,255,0.97)',titleColor:'#1f2328',bodyColor:'#57606a',borderColor:'#d0d7de',borderWidth:1}},
-      scales:{
-        x:{display:labels.length<=60,ticks:{color:'#57606a',font:{size:10},maxTicksLimit:10},grid:{color:'rgba(208,215,222,.4)'}},
-        y:{min:haMin,grid:{color:'rgba(208,215,222,.4)'},ticks:{color:'#57606a',font:{size:10}}}
-      }
-    }
-  });
+  dc('p2');chartInstances.p2=new Chart(document.getElementById('p2').getContext('2d'),{type:'bar',data:{labels,datasets:[{label:'HA',data:haC,backgroundColor:haC.map((v,i)=>v>=haO[i]?'rgba(26,127,55,0.80)':'rgba(207,34,46,0.80)'),borderColor:haC.map((v,i)=>v>=haO[i]?'#1a7f37':'#cf222e'),borderWidth:1,barPercentage:0.9,categoryPercentage:1.0}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:0},plugins:{legend:{display:false}},scales:{x:{display:labels.length<=60,ticks:{color:'#57606a',font:{size:10},maxTicksLimit:10},grid:{color:'rgba(208,215,222,.4)'}},y:{grid:{color:'rgba(208,215,222,.4)'},ticks:{color:'#57606a',font:{size:10}}}}}});
 
-  // ── BAFFETTI — pannello dedicato con segnale COMPRA/FUORI ───────
-  destroyChart('pBaf');
-  // calcola baffetti consecutivi per ogni barra
-  const bafCount=ao.map((v,i)=>{
-    if(v===null) return 0;
-    let n=0;
-    for(let j=i;j>0;j--){
-      if(ao[j]!==null&&ao[j-1]!==null&&ao[j]>ao[j-1]) n++;
-      else break;
-    }
-    return n;
-  });
-  const bafColors=bafCount.map(n=>
-    n>=3?'rgba(26,127,55,0.85)':n>=1?'rgba(240,136,62,0.7)':'rgba(208,215,222,0.5)'
-  );
-  const lastBaf=bafCount[bafCount.length-1]||0;
-  const lastAO=ao.filter(x=>x!==null).pop()||0;
+  const bafC=ao.map((v,i)=>{if(v===null)return 0;let n=0;for(let j=i;j>0;j--){if(ao[j]!==null&&ao[j-1]!==null&&ao[j]>ao[j-1])n++;else break;}return n;});
+  const lastBaf=bafC[bafC.length-1]||0,lastAO=ao.filter(x=>x!==null).pop()||0;
   const bafEl=document.getElementById('bafSignal');
-  if(bafEl){
-    if(lastBaf>=3&&lastAO>0){bafEl.textContent='✅ COMPRA (Baf='+lastBaf+')';bafEl.style.cssText='color:#1a7f37;background:#dafbe1;border:1px solid #1a7f37;font-size:12px;font-weight:700;padding:2px 10px;border-radius:10px;';}
-    else if(lastBaf>=1&&lastAO>0){bafEl.textContent='🟡 ATTESA (Baf='+lastBaf+')';bafEl.style.cssText='color:#7d4e00;background:#fff8c5;border:1px solid #7d4e00;font-size:12px;font-weight:700;padding:2px 10px;border-radius:10px;';}
-    else{bafEl.textContent='⛔ FUORI';bafEl.style.cssText='color:#cf222e;background:#ffebe9;border:1px solid #cf222e;font-size:12px;font-weight:700;padding:2px 10px;border-radius:10px;';}
-  }
-  const legEl=document.getElementById('bafLegend');
-  if(legEl) legEl.innerHTML='<span style="color:#1a7f37">■ ≥3 baffetti = COMPRA</span><span style="color:#bc4c00">■ 1-2 baffetti = attesa</span><span style="color:#8b949e">■ 0 = fuori / ribasso</span>';
-  chartInstances.pBaf=new Chart(document.getElementById('pBaf').getContext('2d'),{
-    type:'bar',
-    data:{labels,datasets:[{label:'Baffetti',data:bafCount,backgroundColor:bafColors,borderWidth:0}]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'Baffetti: '+ctx.parsed.y}}},
-      scales:{x:{display:false},y:{grid:{color:'rgba(208,215,222,.4)'},ticks:{color:'#57606a',font:{size:9},stepSize:1},min:0,max:Math.max(5,...bafCount)}}
-    }
-  });
+  if(bafEl){if(lastBaf>=3&&lastAO>0){bafEl.textContent='✅ COMPRA (Baf='+lastBaf+')';bafEl.style.cssText='color:#1a7f37;background:#dafbe1;border:1px solid #1a7f37;font-size:12px;font-weight:700;padding:2px 10px;border-radius:10px;';}else if(lastBaf>=1&&lastAO>0){bafEl.textContent='🟡 ATTESA (Baf='+lastBaf+')';bafEl.style.cssText='color:#7d4e00;background:#fff8c5;border:1px solid #7d4e00;font-size:12px;font-weight:700;padding:2px 10px;border-radius:10px;';}else{bafEl.textContent='⛔ FUORI';bafEl.style.cssText='color:#cf222e;background:#ffebe9;border:1px solid #cf222e;font-size:12px;font-weight:700;padding:2px 10px;border-radius:10px;';}}
+  const legEl=document.getElementById('bafLegend');if(legEl)legEl.innerHTML='<span style="color:#1a7f37">■ ≥3 COMPRA</span><span style="color:#bc4c00">■ 1-2 attesa</span><span style="color:#8b949e">■ 0 fuori</span>';
+  dc('pBaf');chartInstances.pBaf=new Chart(document.getElementById('pBaf').getContext('2d'),{type:'bar',data:{labels,datasets:[{label:'Baffetti',data:bafC,backgroundColor:bafC.map(n=>n>=3?'rgba(26,127,55,0.85)':n>=1?'rgba(240,136,62,0.7)':'rgba(208,215,222,0.5)'),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{min:0,max:Math.max(5,...bafC),grid:{color:'rgba(208,215,222,.4)'},ticks:{color:'#57606a',font:{size:9},stepSize:1}}}}});
 
-  // ── P3: AO ─────────────────────────────────────────────────────
-  destroyChart('p3');
-  chartInstances.p3=new Chart(document.getElementById('p3').getContext('2d'),{
-    type:'bar',
-    data:{labels,datasets:[{label:'AO',data:ao,
-      backgroundColor:ao.map((v,i)=>{
-        if(v===null) return 'transparent';
-        const prev=ao[i-1];
-        if(v>=0) return v>=(prev||0)?'rgba(26,127,55,0.80)':'rgba(26,127,55,0.30)';
-        return v<=(prev||0)?'rgba(207,34,46,0.80)':'rgba(207,34,46,0.30)';
-      }),borderWidth:0}]},
-    options:{...chartOpts('AO',labels.length),scales:{x:{display:false},y:{grid:{color:'rgba(208,215,222,.4)'},ticks:{color:'#57606a',font:{size:10}}}}}
-  });
+  dc('p3');chartInstances.p3=new Chart(document.getElementById('p3').getContext('2d'),{type:'bar',data:{labels,datasets:[{label:'AO',data:ao,backgroundColor:ao.map((v,i)=>{if(v===null)return'transparent';const prev=ao[i-1];if(v>=0)return v>=(prev||0)?'rgba(26,127,55,0.80)':'rgba(26,127,55,0.30)';return v<=(prev||0)?'rgba(207,34,46,0.80)':'rgba(207,34,46,0.30)';}),borderWidth:0}]},options:{...chartOpts(labels.length),scales:{x:{display:false},y:{grid:{color:'rgba(208,215,222,.4)'},ticks:{color:'#57606a',font:{size:10}}}}}});
 
-  // ── P4: RSI ─────────────────────────────────────────────────────
-  destroyChart('p4');
-  chartInstances.p4=new Chart(document.getElementById('p4').getContext('2d'),{
-    type:'line',
-    data:{labels,datasets:[
-      {label:'RSI',data:rsiArr,borderColor:'#e3b341',borderWidth:1.5,pointRadius:0,fill:false,tension:0.3,spanGaps:true},
-      {label:'70',data:new Array(c.length).fill(70),borderColor:'rgba(207,34,46,0.35)',borderWidth:1,pointRadius:0,borderDash:[4,4],fill:false},
-      {label:'30',data:new Array(c.length).fill(30),borderColor:'rgba(26,127,55,0.35)',borderWidth:1,pointRadius:0,borderDash:[4,4],fill:false},
-    ]},
-    options:{...chartOpts('RSI',labels.length),scales:{x:{display:false},y:{min:0,max:100,grid:{color:'rgba(208,215,222,.4)'},ticks:{color:'#57606a',font:{size:10}}}}}
-  });
+  dc('p4');chartInstances.p4=new Chart(document.getElementById('p4').getContext('2d'),{type:'line',data:{labels,datasets:[{label:'RSI',data:rsiArr,borderColor:'#e3b341',borderWidth:1.5,pointRadius:0,fill:false,tension:0.3,spanGaps:true},{label:'70',data:new Array(c.length).fill(70),borderColor:'rgba(207,34,46,0.35)',borderWidth:1,pointRadius:0,borderDash:[4,4],fill:false},{label:'30',data:new Array(c.length).fill(30),borderColor:'rgba(26,127,55,0.35)',borderWidth:1,pointRadius:0,borderDash:[4,4],fill:false}]},options:{...chartOpts(labels.length),scales:{x:{display:false},y:{min:0,max:100,grid:{color:'rgba(208,215,222,.4)'},ticks:{color:'#57606a',font:{size:10}}}}}});
 
-  // ── P5: Volume ──────────────────────────────────────────────────
-  destroyChart('p5');
-  const vAvg20=sma(v,20);
-  chartInstances.p5=new Chart(document.getElementById('p5').getContext('2d'),{
-    type:'bar',
-    data:{labels,datasets:[
-      {label:'Volume',data:v,backgroundColor:volColors,borderWidth:0},
-      {label:'Media 20',data:vAvg20,type:'line',borderColor:'rgba(9,105,218,0.8)',borderWidth:1.5,pointRadius:0,fill:false,spanGaps:true}
-    ]},
-    options:{...chartOpts('VOL',labels.length),scales:{
-      x:{display:false},
-      y:{grid:{color:'rgba(208,215,222,.4)'},ticks:{color:'#57606a',font:{size:10},callback:x=>x>=1e6?(x/1e6).toFixed(0)+'M':x>=1e3?(x/1e3).toFixed(0)+'K':x}}
-    }}
-  });
-}
-function chartOpts(label,n){
-  return{
-    responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:false},tooltip:{
-      mode:'index',intersect:false,
-      backgroundColor:'rgba(255,255,255,0.97)',titleColor:'#1f2328',bodyColor:'#57606a',
-      borderColor:'#d0d7de',borderWidth:1
-    }},
-    scales:{
-      x:{
-        display:n<=120,
-        ticks:{color:'#57606a',font:{size:10},maxRotation:0,maxTicksLimit:10,autoSkip:true},
-        grid:{color:'rgba(208,215,222,.4)'}
-      },
-      y:{grid:{color:'rgba(208,215,222,.4)'},ticks:{color:'#57606a',font:{size:10}}}
-    },
-    animation:{duration:0},
-    interaction:{mode:'index',intersect:false}
-  };
+  dc('p5');const vAvg20=sma(v,20);chartInstances.p5=new Chart(document.getElementById('p5').getContext('2d'),{type:'bar',data:{labels,datasets:[{label:'Volume',data:v,backgroundColor:volC,borderWidth:0},{label:'Media 20',data:vAvg20,type:'line',borderColor:'rgba(9,105,218,0.8)',borderWidth:1.5,pointRadius:0,fill:false,spanGaps:true}]},options:{...chartOpts(labels.length),scales:{x:{display:false},y:{grid:{color:'rgba(208,215,222,.4)'},ticks:{color:'#57606a',font:{size:10},callback:x=>x>=1e6?(x/1e6).toFixed(0)+'M':x>=1e3?(x/1e3).toFixed(0)+'K':x}}}}});
 }
 
 function updateInfoBar(c,h,l,v){
-  const price=c[c.length-1];
-  const prev=c[c.length-2];
-  const chg=prev?((price-prev)/prev*100):0;
-  const kama=calcKAMA(c);
-  const kNow=kama[kama.length-1];
-  const er=calcER(c);
-  const rsi=calcRSI(c);
-  const ao=calcAO(h,l);
-  const baff=calcBaffettiAO(ao);
-  const trd=trendycator(c);
-  const atr=calcATR(h,l,c);
+  const price=c[c.length-1],prev=c[c.length-2],chg=prev?((price-prev)/prev*100):0;
+  const kama=calcKAMA(c),kNow=kama[kama.length-1],er=calcER(c),rsi=calcRSI(c);
+  const ao=calcAO(h,l),baff=calcBaf(ao),trd=trendycator(c),atr=calcATR(h,l,c);
   const trail=atr?price-2*atr:null;
-
   const e=id=>document.getElementById(id);
-  e('ic-price').textContent=price.toFixed(3);
-  e('ic-price').style.color=chg>=0?'#1a7f37':'#cf222e';
+  e('ic-price').textContent=price.toFixed(3);e('ic-price').style.color=chg>=0?'#1a7f37':'#cf222e';
   e('ic-chg').textContent=(chg>=0?'+':'')+chg.toFixed(2)+'%';
   e('ic-kama').textContent=kNow?kNow.toFixed(3):'—';
-  const kgap=kNow?((price-kNow)/kNow*100):0;
-  e('ic-kgap').textContent='Gap: '+kgap.toFixed(2)+'%';
-  e('ic-er').textContent=er?(er*100).toFixed(1)+'%':'—';
-  e('ic-erlbl').textContent=er>=0.5?'Forte':er<0.3?'Laterale':'Moderato';
-  e('ic-rsi').textContent=rsi?rsi.toFixed(1):'—';
-  e('ic-rsi').style.color=rsi>=70?'#f85149':rsi<=30?'#3fb950':'#e3b341';
-  e('ic-rsilbl').textContent=rsi>=70?'Ipercomprato':rsi<=30?'Ipervenduto':rsi<50?'Zona bassa':'Zona alta';
-  e('ic-baff').textContent=baff;
-  e('ic-bafflbl').textContent=baff>=5?'Momentum forte':baff>=3?'Buono':baff>=1?'Inizia':'Assente';
-  const trCls={'VERDE':'#1a7f37','ROSSO':'#cf222e','GRIGIO':'#57606a'};
-  e('ic-trend').textContent=trd;
-  e('ic-trend').style.color=trCls[trd]||'#e6edf3';
+  const kgap=kNow?((price-kNow)/kNow*100):0;e('ic-kgap').textContent='Gap: '+kgap.toFixed(2)+'%';
+  e('ic-er').textContent=er?(er*100).toFixed(1)+'%':'—';e('ic-erlbl').textContent=er>=0.5?'Forte':er<0.3?'Laterale':'Moderato';
+  e('ic-rsi').textContent=rsi?rsi.toFixed(1):'—';e('ic-rsi').style.color=rsi>=70?'#f85149':rsi<=30?'#3fb950':'#e3b341';
+  e('ic-rsilbl').textContent=rsi>=70?'Ipercomprato':rsi<=30?'Ipervenduto':'Neutro';
+  e('ic-baff').textContent=baff;e('ic-bafflbl').textContent=baff>=5?'Forte':baff>=3?'Buono':baff>=1?'Inizia':'Assente';
+  const trCls={VERDE:'#1a7f37',ROSSO:'#cf222e',GRIGIO:'#57606a'};
+  e('ic-trend').textContent=trd;e('ic-trend').style.color=trCls[trd]||'#57606a';
   e('ic-trendlbl').textContent=trd==='VERDE'?'▲ Rialzista':trd==='ROSSO'?'▼ Ribassista':'● Neutro';
-  e('ic-atr').textContent=atr?atr.toFixed(3):'—';
-  e('ic-atrpct').textContent=atr&&price?(atr/price*100).toFixed(2)+'% del prezzo':'—';
-  e('ic-trail').textContent=trail?trail.toFixed(3):'—';
-  e('ic-trailpct').textContent=trail&&price?((price-trail)/price*100).toFixed(2)+'% gap':'—';
-
-  // segnale
-  const aboveKama=kNow&&price>kNow;
-  const aoNow=ao[ao.length-1];
-  const mm20v=sma(c,20);const mm50v=sma(c,50);
-  const mm20=mm20v[mm20v.length-1];const mm50=mm50v[mm50v.length-1];
+  e('ic-atr').textContent=atr?atr.toFixed(3):'—';e('ic-atrpct').textContent=atr&&price?(atr/price*100).toFixed(2)+'%':'—';
+  e('ic-trail').textContent=trail?trail.toFixed(3):'—';e('ic-trailpct').textContent=trail&&price?((price-trail)/price*100).toFixed(2)+'% gap':'—';
+  const aboveKama=kNow&&price>kNow,aoNow=ao[ao.length-1];
+  const mm20v=sma(c,20),mm50v=sma(c,50),mm20=mm20v[mm20v.length-1],mm50=mm50v[mm50v.length-1];
   const mmAlign=mm20&&mm50&&price>mm20&&mm20>mm50;
   let sig='—';
-  if(trd==='VERDE'&&aboveKama&&er>=0.50&&baff>=3&&mmAlign) sig='🟢 LONG';
-  else if(aboveKama&&baff>=3) sig='🔵 EARLY';
-  else if(aboveKama&&baff>=1) sig='🟡 WATCH';
-  else if(!aboveKama&&trd==='ROSSO') sig='⛔ STOP';
-  else if(!aboveKama) sig='🔴 USCITA';
-  else if(aboveKama&&(aoNow<=0||trd==='GRIGIO')) sig='⚠️ ATTENZ';
-  const mr=checkMR(c,kama,er,rsi,ao);
+  if(trd==='VERDE'&&aboveKama&&er>=0.50&&baff>=3&&mmAlign)sig='🟢 LONG';
+  else if(aboveKama&&baff>=3)sig='🔵 EARLY';
+  else if(aboveKama&&baff>=1)sig='🟡 WATCH';
+  else if(!aboveKama&&trd==='ROSSO')sig='⛔ STOP';
+  else if(!aboveKama)sig='🔴 USCITA';
+  else if(aboveKama&&(aoNow<=0||trd==='GRIGIO'))sig='⚠️ ATTENZ';
   e('ic-sig').textContent=sig;
-  e('ic-mr').textContent=mr?'🟠 MEAN REV':'';
+  e('ic-mr').textContent=checkMR(c,kama,er,rsi,ao)?'🟠 MEAN REV':'';
 }
 
-// ═══════════════════════════════════════════════════════════════════
-//  BOOT — tutte le dichiarazioni sono già definite, ora è sicuro
-// ═══════════════════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded',()=>{
-  // Detect local file
-  if(window.location.protocol==='file:'){
-    document.getElementById('localWarning').style.display='block';
-  }
-  const urlParams=new URLSearchParams(window.location.search);
-  const chartSym=urlParams.get('chart');
-  const chartName=urlParams.get('name')||'';
-  const chartSrc=urlParams.get('src')||'yahoo';
-  if(chartSym){
-    document.getElementById('tableMode').style.display='none';
-    document.getElementById('chartMode').style.display='block';
-    initChartMode(chartSym,chartName,chartSrc);
-  } else {
-    document.getElementById('chartMode').style.display='none';
-    initTableMode();
-  }
-});
+// ═══ EXCEL ═══
+function exportExcel(){
+  const data=filteredResults.length?filteredResults:allResults.filter(r=>!r.error);
+  if(!data.length){alert('Nessun dato da esportare');return;}
+  const ws_data=[['Ticker','Nome','Categoria','Segnale','Score','Trendycator','Prezzo','ER%','Baffetti','K%','AO','RSI','Sett%','Mese%','VOL x','MM Align','GG Ingresso','Data Ingresso']];
+  data.forEach(r=>{ws_data.push([r.ticker,r.nome||'',r.categoria||'',getSegnale(r),r.score||0,r.trendycator||'',r.price||0,(r.er*100)||0,r.baff||0,r.pkPct||0,r.aoPos?'+':'-',r.rsi||0,r.perfSett||0,r.perfMese||0,r.volRatio||0,r.mmAlign?'Sì':'No',r.cross<999?r.cross:'',r.entryDate||'']);});
+  const wb=XLSX.utils.book_new();const ws=XLSX.utils.aoa_to_sheet(ws_data);XLSX.utils.book_append_sheet(wb,ws,'RAPTOR One');XLSX.writeFile(wb,'RAPTOR_One_'+new Date().toISOString().slice(0,10)+'.xlsx');
+}
 
+// ═══ SMART REFRESH ═══
+function toggleSmart(){smartOn=!smartOn;const btn=document.getElementById('smartToggle');if(smartOn){btn.textContent='🔄 Smart Refresh ON';btn.classList.add('active');scheduleNext();}else{btn.textContent='🔄 Smart Refresh OFF';btn.classList.remove('active');if(smartTimer)clearTimeout(smartTimer);if(smartCountdown)clearInterval(smartCountdown);document.getElementById('countdown').textContent='';}}
+function scheduleNext(){if(!smartOn)return;const now=new Date();const h=now.getHours(),m=now.getMinutes();const mkt=h>=9&&h<17||(h===17&&m<30);let delayMs=mkt?60*60*1000:msToNext9();startCountdown(delayMs);smartTimer=setTimeout(()=>{if(smartOn)startScan().then(()=>scheduleNext());},delayMs);}
+function msToNext9(){const now=new Date();const next=new Date(now);next.setHours(9,0,0,0);if(now>=next)next.setDate(next.getDate()+1);return next-now;}
+function startCountdown(ms){if(smartCountdown)clearInterval(smartCountdown);let rem=Math.floor(ms/1000);function tick(){if(!smartOn){document.getElementById('countdown').textContent='';return;}const h=Math.floor(rem/3600),m=Math.floor((rem%3600)/60),s=rem%60;document.getElementById('countdown').textContent='⏱ '+(h?h+'h ':'')+m.toString().padStart(2,'0')+'m '+s.toString().padStart(2,'0')+'s';if(rem>0)rem--;else clearInterval(smartCountdown);}tick();smartCountdown=setInterval(tick,1000);}
+
+// ═══ SPECS ═══
+function openSpecs(){document.getElementById('specsModal').style.display='block';document.body.style.overflow='hidden';}
+function closeSpecs(){document.getElementById('specsModal').style.display='none';document.body.style.overflow='';}
+
+// ═══ BOOT ═══
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('hTotal').textContent=TICKERS.length;
+  document.getElementById('tsBar').style.display='flex';
+  loadFromJSON().then(ok=>{
+    if(!ok){const src=document.getElementById('srcSelect').value;try{const saved=localStorage.getItem('raptor_one_'+src);if(saved){const obj=JSON.parse(saved);allResults=obj.data||[];document.getElementById('tsText').textContent='📦 Cache locale: '+(obj.ts||'—');updateStats();renderTable();}}catch(e){}}
+  });
+  document.getElementById('srcSelect').addEventListener('change',()=>{TICKERS=document.getElementById('srcSelect').value==='stooq'?TICKERS_STOOQ:TICKERS_YAHOO;allResults=[];document.getElementById('hTotal').textContent=TICKERS.length;loadFromJSON();});
+});
 </script>
 </body>
 </html>
