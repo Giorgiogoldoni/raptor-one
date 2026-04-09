@@ -479,8 +479,6 @@ function openChart(sym,name,src){
 }
 
 // ═══ CHART MODE (usato quando la pagina è aperta con ?chart=) ═══
-let chartJsonCache=null;
-
 async function getChartJson(){if(chartJsonCache)return chartJsonCache;const res=await fetch(CHART_JSON+'?t='+Date.now());if(!res.ok)throw new Error('HTTP '+res.status);chartJsonCache=await res.json();return chartJsonCache;}
 
 function tfParams(tf){
