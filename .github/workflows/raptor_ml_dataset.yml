@@ -1,0 +1,23 @@
+name: RAPTOR ML Dataset
+on:
+  workflow_dispatch:
+jobs:
+  build-dataset:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Installa dipendenze
+        run: pip install yfinance
+      - name: Costruisci il dataset ML
+        run: python build_ml_dataset.py
+      - name: Carica ml_dataset.csv come artifact scaricabile
+        uses: actions/upload-artifact@v4
+        with:
+          name: ml_dataset
+          path: ml_dataset.csv
+          retention-days: 14
