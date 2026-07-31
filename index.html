@@ -285,7 +285,8 @@ tr:hover td{background:#f0f6ff}
     <div class="storia-title">📊 Storia Segnali — ultime 252 barre</div>
     <table class="storia-table" id="storiaTable">
       <thead><tr>
-        <th>#</th><th>Data</th><th>Segnale</th><th>Prezzo</th><th>Δ% dal prec.</th><th>Note</th>
+        <th>#</th><th>Data Entrata</th><th>Data Uscita</th><th>Segnale</th>
+        <th>Prezzo Entrata</th><th>Prezzo Uscita</th><th>Δ%</th><th>Giorni</th><th>Note</th>
       </tr></thead>
       <tbody id="storiaBody"></tbody>
     </table>
@@ -478,63 +479,134 @@ function calcSegnale(close,kama,sar,sarBull,ao,er,baff,mmAlign,rsi){
   return'WATCH';
 }
 
-// ═══ STORIA SEGNALI ═══
+// ═══ STORIA SEGNALI — note dinamiche dai valori reali degli indicatori ═══
+function buildSignalNote(tier, ctx){
+  const er=ctx.er, baff=ctx.baff, rsi=ctx.rsi, cross=ctx.cross, sarStreak=ctx.sarStreak, mmAlign=ctx.mmAlign;
+  const erPct=er!=null?Math.round(er*100):null;
+  switch(tier){
+    case 'BUY1':
+      return `SAR rialzista da ${sarStreak!=null?sarStreak:'?'}gg, incrocio KAMA ${cross!=null?cross:'?'}gg fa, AO in miglioramento`;
+    case 'BUY2':
+      return `Prezzo sopra KAMA, baffetti=${baff!=null?baff:'?'} barre consecutive in salita`;
+    case 'BUY3':
+      return `ER=${erPct!=null?erPct+'%':'?'} (forte), baffetti=${baff!=null?baff:'?'}, medie mobili allineate, sopra KAMA`;
+    case 'EXIT1':
+      return `SAR passato ribassista da ${sarStreak!=null?sarStreak:'?'}gg`;
+    case 'EXIT2':
+      return `Prezzo sotto KAMA e SAR ribassista`;
+    case 'MEAN REV':
+      return `ER basso (${erPct!=null?erPct+'%':'?'}), RSI ipervenduto (${rsi!=null?Math.round(rsi):'?'}), AO in miglioramento`;
+    case 'WATCH':
+      return 'Nessuna condizione di ingresso attiva';
+    default:
+      return '—';
+  }
+}
+
+const BUY_TIERS=['BUY1','BUY2','BUY3'];
+const EXIT_TIERS=['EXIT1','EXIT2'];
+
+function fmtDataIt(ts){
+  const d=new Date(ts*1000);
+  return d.getDate().toString().padStart(2,'0')+'/'+(d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getFullYear();
+}
+
+/** Accoppia ogni ingresso BUY1/2/3 con la sua uscita EXIT1/2 (o "ancora aperta" se non trovata),
+    costruendo una riga-trade con note dinamiche calcolate sui valori reali degli indicatori. */
+function buildTrades(ts, closes, segArr, erArr, baffArr, rsiArr, aoArr, crossArr, mmArr, sarStreakArr){
+  const trades=[];
+  const n=segArr.length;
+  let i=0, prevSeg=null;
+  const ctxAt=(idx)=>({
+    er: erArr?erArr[idx]:null, baff: baffArr?baffArr[idx]:null, rsi: rsiArr?rsiArr[idx]:null,
+    ao: aoArr?aoArr[idx]:null, cross: crossArr?crossArr[idx]:null,
+    mmAlign: mmArr?mmArr[idx]:null, sarStreak: sarStreakArr?sarStreakArr[idx]:null,
+  });
+  while(i<n){
+    const seg=segArr[i];
+    if(BUY_TIERS.includes(seg) && seg!==prevSeg){
+      const entryIdx=i, entryTier=seg;
+      let exitIdx=null, exitTier=null;
+      let j=i+1;
+      while(j<n){ if(EXIT_TIERS.includes(segArr[j])){exitIdx=j; exitTier=segArr[j]; break;} j++; }
+      const entryPrice=closes[entryIdx];
+      const isOpen=exitIdx===null;
+      const exitPrice=isOpen?closes[n-1]:closes[exitIdx];
+      const deltaPct=entryPrice?((exitPrice/entryPrice-1)*100):null;
+      trades.push({
+        entryDate: fmtDataIt(ts[entryIdx]), exitDate: isOpen?null:fmtDataIt(ts[exitIdx]),
+        entryTier, exitTier, entryPrice, exitPrice,
+        deltaPct, days: (isOpen?n-1:exitIdx)-entryIdx, isOpen,
+        entryNote: buildSignalNote(entryTier, ctxAt(entryIdx)),
+        exitNote: isOpen?'Posizione ancora aperta':buildSignalNote(exitTier, ctxAt(exitIdx)),
+      });
+      i = isOpen? n : exitIdx+1;
+      prevSeg = isOpen? seg : exitTier;
+      continue;
+    }
+    prevSeg=seg; i++;
+  }
+  return trades.reverse().slice(0,20);
+}
+
 function calcStoriaFromBars(bars){
   if(!bars||bars.length<60)return[];
-  const c=bars.map(b=>b[4]);
-  const h=bars.map(b=>b[2]);
-  const l=bars.map(b=>b[3]);
-  const ts=bars.map(b=>b[0]);
+  const c=bars.map(b=>b[4]), h=bars.map(b=>b[2]), l=bars.map(b=>b[3]), ts=bars.map(b=>b[0]);
   const kama=calcKAMA(c);
   const {sar:sarArr,bull:sarBull}=calcSAR(h,l);
   const ao=calcAOArray(h,l);
-
-  const storia=[];
-  let prevSeg='';
-
-  for(let i=60;i<c.length;i++){
-    const slice_c=c.slice(0,i+1);
-    const slice_h=h.slice(0,i+1);
-    const slice_l=l.slice(0,i+1);
-    const slice_kama=kama.slice(0,i+1);
-    const slice_ao=ao.slice(0,i+1);
-    const er=calcER(slice_c);
-    const baff=calcBaf(slice_ao);
-    const rsi=calcRSI(slice_c)||50;
-    const mmAlign=calcMmAlign(slice_c);
-    const seg=calcSegnale(slice_c,slice_kama,sarArr[i],sarBull[i],slice_ao,er,baff,mmAlign,rsi);
-
-    if(seg!==prevSeg){
-      const d=new Date(ts[i]*1000);
-      storia.push({
-        idx: storia.length+1,
-        data: d.getDate().toString().padStart(2,'0')+'/'+(d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getFullYear(),
-        segnale: seg,
-        prezzo: c[i],
-        prevPrezzo: storia.length>0?storia[storia.length-1].prezzo:c[i],
-      });
-      prevSeg=seg;
-    }
+  const n=c.length;
+  const segArr=new Array(n).fill(null), erArr=new Array(n).fill(null), baffArr=new Array(n).fill(null),
+        rsiArr=new Array(n).fill(null), crossArr=new Array(n).fill(null), mmArr=new Array(n).fill(null),
+        sarStreakArr=new Array(n).fill(0);
+  let lastBull=null;
+  for(let i=60;i<n;i++){
+    const sc=c.slice(0,i+1), sh=h.slice(0,i+1), sl=l.slice(0,i+1), sk=kama.slice(0,i+1), sao=ao.slice(0,i+1);
+    const er=calcER(sc), baff=calcBaf(sao), rsi=calcRSI(sc)||50, mmAlign=calcMmAlign(sc);
+    segArr[i]=calcSegnale(sc,sk,sarArr[i],sarBull[i],sao,er,baff,mmAlign,rsi);
+    erArr[i]=er; baffArr[i]=baff; rsiArr[i]=rsi; mmArr[i]=mmAlign;
+    sarStreakArr[i]= (lastBull===sarBull[i]) ? (sarStreakArr[i-1]||0)+1 : 0;
+    lastBull=sarBull[i];
+    // giorni dall'ultimo incrocio KAMA
+    let cross=0;
+    for(let k=i;k>0;k--){ if((c[k]>kama[k])!==(c[k-1]>kama[k-1]))break; cross++; }
+    crossArr[i]=cross;
   }
-  return storia.reverse().slice(0,20); // ultimi 20 cambi
+  return buildTrades(ts,c,segArr,erArr,baffArr,rsiArr,ao,crossArr,mmArr,sarStreakArr);
 }
 
-function renderStoria(storia){
+function renderStoriaFromPrecomputed(ts,closes,segArr,erArr,baffArr,rsiArr,aoArr,crossArr,mmArr,sarStreakArr){
+  const trades=buildTrades(ts,closes,segArr,erArr,baffArr,rsiArr,aoArr,crossArr,mmArr,sarStreakArr);
+  renderStoria(trades);
+}
+
+function renderStoria(trades){
   const tb=document.getElementById('storiaBody');
-  if(!storia||!storia.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--text2);padding:12px">Nessun cambio segnale nelle ultime 252 barre</td></tr>';return;}
-  tb.innerHTML=storia.map((s,idx)=>{
-    const delta=idx<storia.length-1?((s.prezzo/storia[idx+1].prezzo-1)*100):null;
-    const deltaStr=delta!=null?(delta>=0?'+':'')+delta.toFixed(2)+'%':'—';
-    const deltaC=delta==null?'':delta>=0?'color:var(--green)':'color:var(--red)';
-    const color=SIG_COLOR[s.segnale]||'#57606a';
-    const bg=SIG_BG[s.segnale]||'#fff';
-    return `<tr style="background:${idx===0?bg:''}">
-      <td style="color:var(--text2);font-size:11px">${s.idx}</td>
-      <td style="font-family:monospace;font-size:11px">${s.data}</td>
-      <td><span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:${bg};color:${color};border:1px solid ${color}">${SIG_ICON[s.segnale]||s.segnale}</span></td>
-      <td style="font-family:monospace;font-weight:600">${s.prezzo.toFixed(4)}</td>
+  if(!trades||!trades.length){tb.innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--text2);padding:12px">Nessun trade completo nelle ultime 252 barre</td></tr>';return;}
+  tb.innerHTML=trades.map((tr,idx)=>{
+    const deltaStr=tr.deltaPct!=null?(tr.deltaPct>=0?'+':'')+tr.deltaPct.toFixed(2)+'%':'—';
+    const deltaC=tr.deltaPct==null?'':tr.deltaPct>=0?'color:var(--green)':'color:var(--red)';
+    const entryColor=SIG_COLOR[tr.entryTier]||'#57606a', entryBg=SIG_BG[tr.entryTier]||'#fff';
+    const exitBadge=tr.isOpen?
+      `<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:#fff8e6;color:#9a6700;border:1px solid #9a6700">APERTA</span>`:
+      `<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:${SIG_BG[tr.exitTier]||'#fff'};color:${SIG_COLOR[tr.exitTier]||'#57606a'};border:1px solid ${SIG_COLOR[tr.exitTier]||'#57606a'}">${SIG_ICON[tr.exitTier]||tr.exitTier}</span>`;
+    return `<tr style="background:${idx===0?entryBg:''}">
+      <td style="color:var(--text2);font-size:11px">${trades.length-idx}</td>
+      <td style="font-family:monospace;font-size:11px">${tr.entryDate}</td>
+      <td style="font-family:monospace;font-size:11px">${tr.exitDate||'—'}</td>
+      <td>
+        <span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:${entryBg};color:${entryColor};border:1px solid ${entryColor}">${SIG_ICON[tr.entryTier]||tr.entryTier}</span>
+        → ${exitBadge}
+      </td>
+      <td style="font-family:monospace;font-weight:600">${tr.entryPrice!=null?tr.entryPrice.toFixed(4):'—'}</td>
+      <td style="font-family:monospace;font-weight:600">${tr.exitPrice!=null?tr.exitPrice.toFixed(4):'—'}</td>
       <td style="font-family:monospace;${deltaC}">${deltaStr}</td>
-      <td style="font-size:10px;color:var(--text2)">${idx===0?'← attuale':''}</td>
+      <td style="font-family:monospace;font-size:11px">${tr.days}</td>
+      <td style="font-size:10px;color:var(--text2);max-width:260px">
+        <div><b>Entrata:</b> ${tr.entryNote}</div>
+        <div><b>Uscita:</b> ${tr.exitNote}</div>
+        ${idx===0&&tr.isOpen?'<div style="color:var(--green);font-weight:600">← attuale</div>':''}
+      </td>
     </tr>`;
   }).join('');
 }
@@ -898,7 +970,7 @@ async function loadChartData(sym,src,tf){
       if(bars.length>=10){
         document.getElementById('chartSub').textContent='data/charts · '+new Date().toLocaleDateString('it-IT');
         // Indicatori precalcolati server-side: stesso slice delle barre
-        const src_ind=p.hourly?{kama:j.kama_h,sar:j.sar_h,sarBull:j.sarBull_h}:{kama:j.kama_d,sar:j.sar_d,sarBull:j.sarBull_d,ao:j.ao_d,rsi:j.rsi_d,baff:j.baff_d,segnale:j.segnale_d};
+        const src_ind=p.hourly?{kama:j.kama_h,sar:j.sar_h,sarBull:j.sarBull_h}:{kama:j.kama_d,sar:j.sar_d,sarBull:j.sarBull_d,ao:j.ao_d,rsi:j.rsi_d,baff:j.baff_d,segnale:j.segnale_d,er:j.er_d,cross:j.crossDays_d,mmAlign:j.mmAlign_d,sarStreak:j.sarStreak_d};
         if(src_ind.kama&&src_ind.kama.length){
           const off=(src_ind.kama.length)-bars.length;
           pre={};
@@ -935,7 +1007,7 @@ async function loadChartData(sym,src,tf){
 
     // Storia segnali: usa segnale_d precalcolato se disponibile, altrimenti ricalcola dalle barre daily complete
     if(pre&&pre.segnale&&!p.hourly){
-      renderStoriaFromPrecomputed(t,c,pre.segnale);
+      renderStoriaFromPrecomputed(t,c,pre.segnale,pre.er,pre.baff,pre.rsi,pre.ao,pre.cross,pre.mmAlign,pre.sarStreak);
     }else{
       let allBars=bars;
       if(allBars.length<100){
@@ -954,26 +1026,9 @@ async function loadChartData(sym,src,tf){
     document.getElementById('loadOverlay').style.display='none';
     const wrap=document.getElementById('chartSvgWrap');
     if(wrap)wrap.innerHTML='<div style="padding:40px;text-align:center;color:#cf222e;font-size:14px">Errore caricamento: '+e.message+'</div>';
-    document.getElementById('storiaBody').innerHTML='<tr><td colspan="6" style="color:var(--text2);padding:12px">Dati non disponibili</td></tr>';
+    document.getElementById('storiaBody').innerHTML='<tr><td colspan="9" style="color:var(--text2);padding:12px">Dati non disponibili</td></tr>';
     document.getElementById('chartSub').textContent='Errore: '+e.message;
   }
-}
-
-// ═══ STORIA SEGNALI da array precalcolato (niente ricalcolo JS) ═══
-function renderStoriaFromPrecomputed(ts,closes,segnaleArr){
-  const storia=[];let prevSeg='';
-  for(let i=0;i<segnaleArr.length;i++){
-    const seg=segnaleArr[i];
-    if(!seg)continue;
-    if(seg!==prevSeg){
-      const d=new Date(ts[i]*1000);
-      storia.push({idx:storia.length+1,
-        data:d.getDate().toString().padStart(2,'0')+'/'+(d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getFullYear(),
-        segnale:seg,prezzo:closes[i],prevPrezzo:storia.length>0?storia[storia.length-1].prezzo:closes[i]});
-      prevSeg=seg;
-    }
-  }
-  renderStoria(storia.reverse().slice(0,20));
 }
 
 // ═══ GRAFICO UNICO SVG (Prezzo · Heikin-Ashi · Renko · Volume · Baffetti · AO · RSI) ═══
