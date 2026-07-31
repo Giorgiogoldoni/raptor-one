@@ -197,28 +197,49 @@ def calc_atr(high, low, close, n=14):
     return atr
 
 def calc_renko(dates, close, brick_size):
-    """Renko standard: un mattoncino ogni volta che il prezzo si muove di
-    almeno un brick_size dal livello corrente. Brick adattivo = ATR(14)
-    del ticker, quindi coerente con la sua volatilità reale."""
+    """Renko standard: continuazione di trend = 1 brick_size dal livello
+    corrente; inversione di trend = 2 brick_size (convenzione classica,
+    altrimenti il rumore genererebbe inversioni continue). Brick adattivo
+    = ATR(14) del ticker, quindi coerente con la sua volatilità reale.
+    NOTA: la versione precedente bloccava la direzione al primo mattoncino
+    (bug — poteva salire ma non scendere mai più, o viceversa)."""
     if not brick_size or brick_size <= 0 or len(close) < 2:
         return []
     bricks = []
     level = close[0]
-    direction = 0
+    direction = 0  # 0=nessun trend ancora, 1=rialzista, -1=ribassista
     for i in range(1, len(close)):
         price = close[i]
-        moved = True
-        while moved:
-            moved = False
+        d = dates[i] if i < len(dates) else None
+        while True:
             if direction >= 0 and price >= level + brick_size:
-                bricks.append({'o': round(level,4), 'c': round(level+brick_size,4), 'dir': 1,
-                                'd': dates[i] if i < len(dates) else None})
-                level += brick_size; direction = 1; moved = True
-            elif direction <= 0 and price <= level - brick_size:
-                bricks.append({'o': round(level,4), 'c': round(level-brick_size,4), 'dir': -1,
-                                'd': dates[i] if i < len(dates) else None})
-                level -= brick_size; direction = -1; moved = True
+                new_level = level + brick_size
+                bricks.append({'o': round(level,4), 'c': round(new_level,4), 'dir': 1, 'd': d})
+                level = new_level; direction = 1; continue
+            if direction <= 0 and price <= level - brick_size:
+                new_level = level - brick_size
+                bricks.append({'o': round(level,4), 'c': round(new_level,4), 'dir': -1, 'd': d})
+                level = new_level; direction = -1; continue
+            if direction == 1 and price <= level - 2*brick_size:
+                new_level = level - brick_size
+                bricks.append({'o': round(level,4), 'c': round(new_level,4), 'dir': -1, 'd': d})
+                level = new_level; direction = -1; continue
+            if direction == -1 and price >= level + 2*brick_size:
+                new_level = level + brick_size
+                bricks.append({'o': round(level,4), 'c': round(new_level,4), 'dir': 1, 'd': d})
+                level = new_level; direction = 1; continue
+            break
     return bricks[-200:]
+
+def calc_sar_streak_array(sarBull_arr):
+    """Giorni consecutivi nella direzione SAR corrente (0 = appena flippato)."""
+    n = len(sarBull_arr)
+    streak = [0]*n
+    for i in range(1, n):
+        if sarBull_arr[i] is None or sarBull_arr[i-1] is None:
+            continue
+        streak[i] = streak[i-1]+1 if sarBull_arr[i]==sarBull_arr[i-1] else 0
+    return streak
 
 def sanitize_nan(obj):
     if isinstance(obj, float):
@@ -277,6 +298,7 @@ def process_ticker(info):
         ao_imp_arr = calc_ao_improving_array(ao_arr)
         segnale_arr = calc_segnale_array(closes, kama_arr, er_arr, baff_arr, ao_imp_arr,
                                           sarBull_arr, cross_arr, mm_arr, rsi_arr)
+        sarStreak_arr = calc_sar_streak_array(sarBull_arr)
 
         # ── Indicatori su hourly (stesso set, serve al pannello prezzo per tf 5h/1d) ──
         kama_h, sar_h, sarBull_h = [], [], []
@@ -296,6 +318,8 @@ def process_ticker(info):
             'kama_d': fmt(kama_arr), 'sar_d': fmt(sar_arr), 'sarBull_d': sarBull_arr,
             'ao_d': fmt(ao_arr), 'rsi_d': fmt(rsi_arr), 'baff_d': baff_arr,
             'segnale_d': segnale_arr,
+            'er_d': fmt(er_arr), 'crossDays_d': cross_arr, 'mmAlign_d': mm_arr,
+            'sarStreak_d': sarStreak_arr,
             'kama_h': fmt(kama_h), 'sar_h': fmt(sar_h), 'sarBull_h': sarBull_h,
             'atr': round(atr,4) if atr else None,
             'renko_brick': brick, 'renko': renko,
