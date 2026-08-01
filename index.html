@@ -278,6 +278,11 @@ tr:hover td{background:#f0f6ff}
     <div class="info-card"><div class="lbl">Trendycator</div><div class="val" id="ic-trend">—</div><div class="sub" style="font-size:9px;color:#aaa">solo info</div></div>
     <div class="info-card"><div class="lbl">ATR(14)</div><div class="val" id="ic-atr">—</div><div class="sub" id="ic-atrpct">—</div></div>
     <div class="info-card"><div class="lbl">Trail Stop</div><div class="val" id="ic-trail">—</div><div class="sub" id="ic-trailpct">—</div></div>
+    <div class="info-card" id="ic-mlexit-card" style="display:none;border-color:#6e40c9">
+      <div class="lbl" style="color:#6e40c9">🎯 Uscita ML</div>
+      <div class="val" id="ic-mlexit" style="color:#6e40c9">—</div>
+      <div class="sub" id="ic-mlexitlbl">—</div>
+    </div>
   </div>
 
   <!-- STORIA SEGNALI -->
@@ -513,7 +518,7 @@ function fmtDataIt(ts){
 
 /** Accoppia ogni ingresso BUY1/2/3 con la sua uscita EXIT1/2 (o "ancora aperta" se non trovata),
     costruendo una riga-trade con note dinamiche calcolate sui valori reali degli indicatori. */
-function buildTrades(ts, closes, segArr, erArr, baffArr, rsiArr, aoArr, crossArr, mmArr, sarStreakArr){
+function buildTrades(ts, closes, segArr, erArr, baffArr, rsiArr, aoArr, crossArr, mmArr, sarStreakArr, mlExit){
   const trades=[];
   const n=segArr.length;
   let i=0, prevSeg=null;
@@ -533,12 +538,21 @@ function buildTrades(ts, closes, segArr, erArr, baffArr, rsiArr, aoArr, crossArr
       const isOpen=exitIdx===null;
       const exitPrice=isOpen?closes[n-1]:closes[exitIdx];
       const deltaPct=entryPrice?((exitPrice/entryPrice-1)*100):null;
+      let exitNote;
+      if(!isOpen){
+        exitNote=buildSignalNote(exitTier, ctxAt(exitIdx));
+      }else if(mlExit){
+        const sign=mlExit.peak_return_pct>=0?'+':'';
+        exitNote=`Posizione ancora aperta — 🎯 ML: picco atteso ${sign}${mlExit.peak_return_pct.toFixed(1)}%, di solito entro ${Math.round(mlExit.days_to_peak)}gg`;
+      }else{
+        exitNote='Posizione ancora aperta';
+      }
       trades.push({
         entryDate: fmtDataIt(ts[entryIdx]), exitDate: isOpen?null:fmtDataIt(ts[exitIdx]),
         entryTier, exitTier, entryPrice, exitPrice,
         deltaPct, days: (isOpen?n-1:exitIdx)-entryIdx, isOpen,
         entryNote: buildSignalNote(entryTier, ctxAt(entryIdx)),
-        exitNote: isOpen?'Posizione ancora aperta':buildSignalNote(exitTier, ctxAt(exitIdx)),
+        exitNote,
       });
       i = isOpen? n : exitIdx+1;
       prevSeg = isOpen? seg : exitTier;
@@ -575,8 +589,8 @@ function calcStoriaFromBars(bars){
   return buildTrades(ts,c,segArr,erArr,baffArr,rsiArr,ao,crossArr,mmArr,sarStreakArr);
 }
 
-function renderStoriaFromPrecomputed(ts,closes,segArr,erArr,baffArr,rsiArr,aoArr,crossArr,mmArr,sarStreakArr){
-  const trades=buildTrades(ts,closes,segArr,erArr,baffArr,rsiArr,aoArr,crossArr,mmArr,sarStreakArr);
+function renderStoriaFromPrecomputed(ts,closes,segArr,erArr,baffArr,rsiArr,aoArr,crossArr,mmArr,sarStreakArr,mlExit){
+  const trades=buildTrades(ts,closes,segArr,erArr,baffArr,rsiArr,aoArr,crossArr,mmArr,sarStreakArr,mlExit);
   renderStoria(trades);
 }
 
@@ -962,7 +976,7 @@ function chartOpts(n){return{responsive:true,maintainAspectRatio:false,plugins:{
 
 async function loadChartData(sym,src,tf){
   try{
-    const p=tfParams(tf);let bars=[];let pre=null;let renko=null;let renkoBrick=null;
+    const p=tfParams(tf);let bars=[];let pre=null;let renko=null;let renkoBrick=null;let mlExit=null;
     try{
       const j=await getTickerChartJson(sym);
       const raw=p.hourly?j.h:j.d;
@@ -970,14 +984,14 @@ async function loadChartData(sym,src,tf){
       if(bars.length>=10){
         document.getElementById('chartSub').textContent='data/charts · '+new Date().toLocaleDateString('it-IT');
         // Indicatori precalcolati server-side: stesso slice delle barre
-        const src_ind=p.hourly?{kama:j.kama_h,sar:j.sar_h,sarBull:j.sarBull_h}:{kama:j.kama_d,sar:j.sar_d,sarBull:j.sarBull_d,ao:j.ao_d,rsi:j.rsi_d,baff:j.baff_d,segnale:j.segnale_d,er:j.er_d,cross:j.crossDays_d,mmAlign:j.mmAlign_d,sarStreak:j.sarStreak_d};
+        const src_ind=p.hourly?{kama:j.kama_h,sar:j.sar_h,sarBull:j.sarBull_h}:{kama:j.kama_d,sar:j.sar_d,sarBull:j.sarBull_d,ao:j.ao_d,rsi:j.rsi_d,rsi5:j.rsi5_d,baff:j.baff_d,segnale:j.segnale_d,er:j.er_d,cross:j.crossDays_d,mmAlign:j.mmAlign_d,sarStreak:j.sarStreak_d};
         if(src_ind.kama&&src_ind.kama.length){
           const off=(src_ind.kama.length)-bars.length;
           pre={};
           Object.keys(src_ind).forEach(k=>{if(src_ind[k])pre[k]=src_ind[k].slice(Math.max(0,off));});
         }
       }
-      renko=j.renko||[]; renkoBrick=j.renko_brick||null;
+      renko=j.renko||[]; renkoBrick=j.renko_brick||null; mlExit=j.ml_exit||null;
     }catch(e){chartJsonCache=null;
       console.warn('chart JSON per-ticker non disponibile:',e);}
     let c=[],h=[],l=[],v=[],t=[];
@@ -1007,7 +1021,7 @@ async function loadChartData(sym,src,tf){
 
     // Storia segnali: usa segnale_d precalcolato se disponibile, altrimenti ricalcola dalle barre daily complete
     if(pre&&pre.segnale&&!p.hourly){
-      renderStoriaFromPrecomputed(t,c,pre.segnale,pre.er,pre.baff,pre.rsi,pre.ao,pre.cross,pre.mmAlign,pre.sarStreak);
+      renderStoriaFromPrecomputed(t,c,pre.segnale,pre.er,pre.baff,pre.rsi,pre.ao,pre.cross,pre.mmAlign,pre.sarStreak,mlExit);
     }else{
       let allBars=bars;
       if(allBars.length<100){
@@ -1021,7 +1035,7 @@ async function loadChartData(sym,src,tf){
 
     document.getElementById('loadOverlay').style.display='none';
     document.getElementById('chartSub').textContent=src.toUpperCase()+' · '+new Date().toLocaleDateString('it-IT');
-    setTimeout(()=>{renderChartSVG(c,h,l,v,t,tf,pre,renko,renkoBrick);},50);
+    setTimeout(()=>{renderChartSVG(c,h,l,v,t,tf,pre,renko,renkoBrick,mlExit);},50);
   }catch(e){
     document.getElementById('loadOverlay').style.display='none';
     const wrap=document.getElementById('chartSvgWrap');
@@ -1032,11 +1046,12 @@ async function loadChartData(sym,src,tf){
 }
 
 // ═══ GRAFICO UNICO SVG (Prezzo · Heikin-Ashi · Renko · Volume · Baffetti · AO · RSI) ═══
-function renderChartSVG(c,h,l,v,t,tf,pre,renko,renkoBrick){
+function renderChartSVG(c,h,l,v,t,tf,pre,renko,renkoBrick,mlExit){
   const N=c.length;
   const kama=(pre&&pre.kama)?pre.kama:calcKAMA(c);
   const ao=(pre&&pre.ao)?pre.ao:calcAOArray(h,l);
   const rsiArr=(pre&&pre.rsi)?pre.rsi:c.map((_,i)=>calcRSI(c.slice(0,i+1)));
+  const rsi5Arr=(pre&&pre.rsi5)?pre.rsi5:c.map((_,i)=>calcRSI(c.slice(0,i+1),5));
   const mm20=sma(c,20),mm50=sma(c,50),mm100=sma(c,100);
   const sarSrc=(pre&&pre.sar&&pre.sarBull)?{sar:pre.sar,bull:pre.sarBull}:calcSAR(h,l);
   const sarArr=sarSrc.sar,sarBull=sarSrc.bull;
@@ -1063,7 +1078,7 @@ function renderChartSVG(c,h,l,v,t,tf,pre,renko,renkoBrick){
   // Baffetti: usa baff_d precalcolato (coerente col motore segnali) se disponibile
   const bafC=(pre&&pre.baff)?pre.baff:ao.map((vv,i)=>{if(vv===null)return 0;let n=0;for(let j=i;j>0;j--){if(ao[j]!==null&&ao[j-1]!==null&&ao[j]>ao[j-1])n++;else break;}return n;});
 
-  updateInfoBar(c,h,l,v,kama,sarArr,sarBull,ao);
+  updateInfoBar(c,h,l,v,kama,sarArr,sarBull,ao,mlExit);
 
   // ── Costruzione SVG unico ──
   const wrap=document.getElementById('chartSvgWrap');
@@ -1072,8 +1087,8 @@ function renderChartSVG(c,h,l,v,t,tf,pre,renko,renkoBrick){
   const PAD={l:50,r:66,t:8,b:22};
   const PW=W-PAD.l-PAD.r;
   const panels=[
-    {id:'price',h:260},{id:'ha',h:90},{id:'renko',h:90},
-    {id:'vol',h:60},{id:'baf',h:50},{id:'ao',h:70},{id:'rsi',h:90},
+    {id:'price',h:280},{id:'renko',h:90},
+    {id:'vol',h:60},{id:'baf',h:50},{id:'ao',h:70},{id:'rsi',h:100},
   ];
   const GAP=4;
   const totalH=panels.reduce((s,p)=>s+p.h+GAP,0)+PAD.t+PAD.b;
@@ -1101,15 +1116,23 @@ function renderChartSVG(c,h,l,v,t,tf,pre,renko,renkoBrick){
     for(let g=0;g<=4;g++){const gy=yTop+hh/4*g;line(PAD.l,gy,PAD.l+PW,gy,g===0||g===4?'#d0d7de':'#eef0f3',g===0||g===4?0.8:0.5);}
 
     if(panel.id==='price'){
-      const allP=[...c,...kama.filter(x=>x!=null),...mm20.filter(x=>x!=null),...mm100.filter(x=>x!=null)];
+      const allP=[...ha.haH,...ha.haL,...kama.filter(x=>x!=null),...mm20.filter(x=>x!=null),...mm100.filter(x=>x!=null)];
       const mn=Math.min(...allP)*0.995, mx=Math.max(...allP)*1.005;
       const sy=vv=>scY(vv,mn,mx,yTop,hh);
       for(let g=0;g<=4;g++){const vv=mn+(mx-mn)/4*g; txt(PAD.l-4,sy(vv)+3,vv<10?vv.toFixed(3):vv.toFixed(2),'#57606a',8,'end');}
+      // Heikin-Ashi (sostituisce la linea prezzo grezza — stesso stile di raptor-leva)
+      const bw=Math.max(1,PW/N*0.6);
+      for(let i=0;i<N;i++){
+        const bull=ha.haC[i]>=ha.haO[i];
+        const col=bull?'#1a7f37':'#cf222e';
+        line(xPos(i),sy(ha.haH[i]),xPos(i),sy(ha.haL[i]),col,1);
+        const yb=sy(Math.max(ha.haO[i],ha.haC[i])),yb2=sy(Math.min(ha.haO[i],ha.haC[i]));
+        rectEl(xPos(i)-bw/2,yb,bw,Math.max(1,yb2-yb),col,0.85);
+      }
       polyline(mm100.map((vv,i)=>vv!=null?[xPos(i),sy(vv)]:null).filter(Boolean),'#bc8cff',1,'8,4');
       polyline(mm50.map((vv,i)=>vv!=null?[xPos(i),sy(vv)]:null).filter(Boolean),'#e3b341',1,'5,3');
       polyline(mm20.map((vv,i)=>vv!=null?[xPos(i),sy(vv)]:null).filter(Boolean),'#58a6ff',1,'3,3');
       polyline(kama.map((vv,i)=>vv!=null?[xPos(i),sy(vv)]:null).filter(Boolean),'#f0883e',2);
-      polyline(c.map((vv,i)=>[xPos(i),sy(vv)]),'#1f2328',1.5);
       sarArr.forEach((s,i)=>{if(s==null)return;el('circle',{cx:xPos(i).toFixed(1),cy:sy(s).toFixed(1),r:2.6,fill:sarBull[i]?'#6e40c9':'#f85149',stroke:'#fff','stroke-width':0.8});});
       let ps=null;
       const segCol={BUY1:'#1a7f37',BUY2:'#0969da',BUY3:'#6e40c9',EXIT1:'#bc4c00',EXIT2:'#cf222e'};
@@ -1123,22 +1146,7 @@ function renderChartSVG(c,h,l,v,t,tf,pre,renko,renkoBrick){
       const lc=c[N-1];
       rectEl(PAD.l+PW+2,sy(lc)-7,50,14,'#1f2328');
       txt(PAD.l+PW+27,sy(lc)+4,lc<10?lc.toFixed(4):lc.toFixed(2),'#fff',8);
-      txt(PAD.l+2,yTop+10,'PREZZO · KAMA · MM20/50/100 · SAR','#57606a',7.5,'start',700);
-    }
-
-    if(panel.id==='ha'){
-      const allV=[...ha.haH,...ha.haL];
-      const mn=Math.min(...allV)*0.997, mx=Math.max(...allV)*1.003;
-      const sy=vv=>scY(vv,mn,mx,yTop,hh);
-      const bw=Math.max(1,PW/N*0.6);
-      for(let i=0;i<N;i++){
-        const bull=ha.haC[i]>=ha.haO[i];
-        const col=bull?'#1a7f37':'#cf222e';
-        line(xPos(i),sy(ha.haH[i]),xPos(i),sy(ha.haL[i]),col,1);
-        const yb=sy(Math.max(ha.haO[i],ha.haC[i])),yb2=sy(Math.min(ha.haO[i],ha.haC[i]));
-        rectEl(xPos(i)-bw/2,yb,bw,Math.max(1,yb2-yb),col,0.85);
-      }
-      txt(PAD.l+2,yTop+10,'HEIKIN-ASHI','#57606a',7.5,'start',700);
+      txt(PAD.l+2,yTop+10,'PREZZO (HEIKIN-ASHI) · KAMA · MM20/50/100 · SAR','#57606a',7.5,'start',700);
     }
 
     if(panel.id==='renko'){
@@ -1207,10 +1215,19 @@ function renderChartSVG(c,h,l,v,t,tf,pre,renko,renkoBrick){
       const sy=vv=>scY(vv,0,100,yTop,hh);
       rectEl(PAD.l,sy(70),PW,sy(30)-sy(70),'#fff7e6',0.7);
       [70,50,30].forEach(lv=>{line(PAD.l,sy(lv),PAD.l+PW,sy(lv),lv===50?'#d0d7de':'#eef0f3',0.8,lv!==50?'3,3':'');txt(PAD.l-4,sy(lv)+3,lv,'#57606a',7.5,'end');});
+      // Area riempita tra RSI5 e RSI14: verde quando RSI5 sopra (momentum corto in accelerazione), rosso quando sotto
+      for(let i=1;i<N;i++){
+        if(rsiArr[i]==null||rsiArr[i-1]==null||rsi5Arr[i]==null||rsi5Arr[i-1]==null)continue;
+        const bullish=(rsi5Arr[i]+rsi5Arr[i-1])>=(rsiArr[i]+rsiArr[i-1]);
+        const col=bullish?'rgba(26,127,55,.18)':'rgba(207,34,46,.18)';
+        const pts=`${xPos(i-1).toFixed(1)},${sy(rsiArr[i-1]).toFixed(1)} ${xPos(i).toFixed(1)},${sy(rsiArr[i]).toFixed(1)} ${xPos(i).toFixed(1)},${sy(rsi5Arr[i]).toFixed(1)} ${xPos(i-1).toFixed(1)},${sy(rsi5Arr[i-1]).toFixed(1)}`;
+        el('polygon',{points:pts,fill:col});
+      }
       polyline(rsiArr.map((vv,i)=>vv!=null?[xPos(i),sy(vv)]:null).filter(Boolean),'#e3b341',1.5);
+      polyline(rsi5Arr.map((vv,i)=>vv!=null?[xPos(i),sy(vv)]:null).filter(Boolean),'#58a6ff',1.2,'3,2');
       const lr=rsiArr.filter(x=>x!=null).at(-1);
       if(lr!=null){rectEl(PAD.l+PW+2,sy(lr)-6,32,12,'#e3b341');txt(PAD.l+PW+18,sy(lr)+4,lr.toFixed(0),'#1f2328',8);}
-      txt(PAD.l+2,yTop+10,'RSI(14)','#57606a',7.5,'start',700);
+      txt(PAD.l+2,yTop+10,'RSI(14) arancio · RSI(5) blu tratteggiato','#57606a',7.5,'start',700);
     }
 
     if(panel.id==='rsi'){
@@ -1230,12 +1247,12 @@ function renderChartSVG(c,h,l,v,t,tf,pre,renko,renkoBrick){
   const legEl=document.getElementById('chartLegend');
   if(legEl){
     const swf=(color,label)=>`<span style="display:inline-flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:${color};display:inline-block;border-radius:2px"></span>${label}</span>`;
-    legEl.innerHTML=[swf('#1f2328','Prezzo'),swf('#f0883e','KAMA'),swf('#58a6ff','MM20'),swf('#e3b341','MM50'),swf('#bc8cff','MM100'),
+    legEl.innerHTML=[swf('#1a7f37','HA Verde'),swf('#cf222e','HA Rosso'),swf('#f0883e','KAMA'),swf('#58a6ff','MM20'),swf('#e3b341','MM50'),swf('#bc8cff','MM100'),
       swf('#1a7f37','BUY1'),swf('#0969da','BUY2'),swf('#6e40c9','BUY3'),swf('#bc4c00','EXIT1'),swf('#cf222e','EXIT2')].join('');
   }
 }
 
-function updateInfoBar(c,h,l,v,kama,sarArr,sarBull,ao){
+function updateInfoBar(c,h,l,v,kama,sarArr,sarBull,ao,mlExit){
   const price=c[c.length-1],prev=c[c.length-2],chg=prev?((price-prev)/prev*100):0;
   const kNow=kama[kama.length-1],er=calcER(c),rsi=calcRSI(c);
   const aoArr=[...ao].filter(v=>v!=null);
@@ -1269,6 +1286,18 @@ function updateInfoBar(c,h,l,v,kama,sarArr,sarBull,ao){
   const trCls={VERDE:'#1a7f37',ROSSO:'#cf222e',GRIGIO:'#57606a'};e('ic-trend').textContent=trd;e('ic-trend').style.color=trCls[trd];
   e('ic-atr').textContent=atr?atr.toFixed(3):'—';e('ic-atrpct').textContent=atr&&price?(atr/price*100).toFixed(2)+'%':'—';
   e('ic-trail').textContent=trail?trail.toFixed(3):'—';e('ic-trailpct').textContent=trail&&price?((price-trail)/price*100).toFixed(2)+'% gap':'—';
+
+  // Card "Uscita ML": visibile solo se posizione aperta (BUY1/BUY2) e il modello ha una previsione
+  const mlCard=e('ic-mlexit-card');
+  if(mlCard){
+    if(mlExit&&(segnale==='BUY1'||segnale==='BUY2')){
+      mlCard.style.display='';
+      e('ic-mlexit').textContent=(mlExit.peak_return_pct>=0?'+':'')+mlExit.peak_return_pct.toFixed(1)+'%';
+      e('ic-mlexitlbl').textContent='di solito entro '+Math.round(mlExit.days_to_peak)+'gg';
+    }else{
+      mlCard.style.display='none';
+    }
+  }
 }
 
 // ═══ EXCEL ═══
