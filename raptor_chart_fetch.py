@@ -19,6 +19,14 @@ Novità v3.0:
 import json, time, datetime, os, math
 import yfinance as yf
 
+# ── Modello ML per suggerimento uscita (allenato offline, solo inferenza qui) ──
+try:
+    import joblib
+    _ML_EXIT = joblib.load(os.path.join(os.path.dirname(__file__), 'models_exit.joblib'))
+except Exception as _e:
+    print(f"ATTENZIONE: modello ML uscita non caricato ({_e}) — suggerimento uscita disattivato")
+    _ML_EXIT = None
+
 # ═══════════════════════════════════════════════════════
 #  TICKER LIST (stessa dell'universo v2, EIMI.MI deduplicato)
 # ═══════════════════════════════════════════════════════
@@ -291,6 +299,7 @@ def process_ticker(info):
         sar_arr, sarBull_arr = calc_sar_array(highs, lows)
         ao_arr = calc_ao_array(highs, lows)
         rsi_arr = calc_rsi_array(closes)
+        rsi5_arr = calc_rsi_array(closes, n=5)
         er_arr = calc_er_array(closes)
         baff_arr = calc_baffetti_array(highs, lows)
         mm_arr = calc_mm_align_array(closes)
@@ -312,17 +321,41 @@ def process_ticker(info):
         brick = round(atr, 4) if atr else None
         renko = calc_renko(dates, closes, brick) if brick else []
 
+        # ── Suggerimento uscita ML: solo se il segnale ATTUALE (ultima barra) è BUY1/BUY2 ──
+        ml_exit = None
+        last_seg = segnale_arr[-1] if segnale_arr else None
+        if _ML_EXIT is not None and last_seg in ('BUY1', 'BUY2'):
+            try:
+                i = len(closes) - 1
+                vol_avg20 = sum(vols[max(0,i-20):i])/max(1,min(20,i)) if i > 0 else 1
+                feat = {
+                    'er': er_arr[i], 'baff': baff_arr[i],
+                    'rsi': rsi_arr[i] if rsi_arr[i] is not None else 50,
+                    'ao': ao_arr[i] if ao_arr[i] is not None else 0,
+                    'cross_days': cross_arr[i], 'mm_align': int(mm_arr[i]),
+                    'atr_pct': (atr/closes[i]*100) if atr and closes[i] else 0,
+                    'vol_ratio': (vols[i]/vol_avg20) if vol_avg20 else 1,
+                    'tier_buy1': 1 if last_seg == 'BUY1' else 0,
+                }
+                X = [[feat[f] for f in _ML_EXIT['features']]]
+                peak_pct = float(_ML_EXIT['reg_peak'].predict(X)[0])
+                days_peak = float(_ML_EXIT['reg_days'].predict(X)[0])
+                ml_exit = {'peak_return_pct': round(peak_pct, 2), 'days_to_peak': round(days_peak, 1)}
+            except Exception as e:
+                print(f"  ATTENZIONE ML uscita {symbol}: {e}")
+
         result = {
             'ticker': info['t'], 'yahoo': symbol,
             'd': d_bars, 'h': h_bars,
             'kama_d': fmt(kama_arr), 'sar_d': fmt(sar_arr), 'sarBull_d': sarBull_arr,
-            'ao_d': fmt(ao_arr), 'rsi_d': fmt(rsi_arr), 'baff_d': baff_arr,
+            'ao_d': fmt(ao_arr), 'rsi_d': fmt(rsi_arr), 'rsi5_d': fmt(rsi5_arr), 'baff_d': baff_arr,
             'segnale_d': segnale_arr,
             'er_d': fmt(er_arr), 'crossDays_d': cross_arr, 'mmAlign_d': mm_arr,
             'sarStreak_d': sarStreak_arr,
             'kama_h': fmt(kama_h), 'sar_h': fmt(sar_h), 'sarBull_h': sarBull_h,
             'atr': round(atr,4) if atr else None,
             'renko_brick': brick, 'renko': renko,
+            'ml_exit': ml_exit,
         }
         return sanitize_nan(result)
     except Exception as e:
