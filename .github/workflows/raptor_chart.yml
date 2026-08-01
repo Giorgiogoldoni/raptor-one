@@ -16,7 +16,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Installa dipendenze
-        run: pip install yfinance
+        run: pip install yfinance scikit-learn==1.8.0 joblib
       - name: Rimuovi vecchio raptor_chart.json monolitico (se presente)
         run: git rm -f --ignore-unmatch raptor_chart.json
       - name: Esegui RAPTOR Chart Fetch
